@@ -1,0 +1,36 @@
+<section>
+    <label class="section-label">Video</label>
+    <div>
+        <mat-form-field appearance="fill">
+            <mat-label>Audio input source</mat-label>
+            <mat-select>
+                <mat-option *ngFor="let item of listMic">{{ item.label }}</mat-option>
+            </mat-select>
+        </mat-form-field>
+    </div>
+</section>
+<mat-divider></mat-divider>
+<section>
+    <label class="section-label">Video</label>
+    <div>
+        <mat-form-field appearance="fill">
+            <mat-label>Audio output destination</mat-label>
+            <mat-select>
+                <mat-option *ngFor="let item of listCamera">{{ item.label }}</mat-option>
+            </mat-select>
+        </mat-form-field>
+    </div>
+</section>
+<mat-divider></mat-divider>
+<section>
+    <label class="section-label">Video</label>
+    <div>
+        <mat-form-field appearance="fill">
+            <mat-label>Video source</mat-label>
+            <mat-select>
+                <mat-option *ngFor="let item of listSpeaker">{{ item.label }}</mat-option>
+            </mat-select>
+        </mat-form-field>
+    </div>
+</section>
+<mat-divider></mat-divider>
