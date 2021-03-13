@@ -15,8 +15,8 @@
     <div class="section-content">
         <mat-form-field appearance="fill" class="mat-form-field">
             <mat-label>Choose audio output destination</mat-label>
-            <mat-select (selectionChange)="__onChooseCamera($event)" [formControl]="cameraFormControl">
-                <mat-option *ngFor="let item of listCamera, index as index" [value]="index">{{ item.label }}</mat-option>
+            <mat-select (selectionChange)="__onChooseSpeaker($event)" [formControl]="cameraFormControl">
+                <mat-option *ngFor="let item of listSpeaker, index as index" [value]="index">{{ item.label }}</mat-option>
             </mat-select>
         </mat-form-field>
     </div>
@@ -27,10 +27,16 @@
     <div class="section-content">
         <mat-form-field appearance="fill" class="mat-form-field">
             <mat-label>Choose video source</mat-label>
-            <mat-select (selectionChange)="__onChooseSpeaker($event)" [formControl]="speakerFormControl">
-                <mat-option *ngFor="let item of listSpeaker, index as index" [value]="index">{{ item.label }}</mat-option>
+            <mat-select (selectionChange)="__onChooseCamera($event)" [formControl]="speakerFormControl">
+                <mat-option *ngFor="let item of listCamera, index as index" [value]="index">{{ item.label }}</mat-option>
             </mat-select>
         </mat-form-field>
     </div>
 </section>
 <mat-divider></mat-divider>
+<ng-container *ngIf="localStream">
+    <video playsinline autoplay></video>
+</ng-container>
+<ng-container *ngIf="!localStream">
+    empty
+</ng-container>
