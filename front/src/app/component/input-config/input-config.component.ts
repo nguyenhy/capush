@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { FormControl, Validators } from '@angular/forms';
 /* package */
 import * as DetectRTC from "detectrtc"
 
@@ -8,27 +9,28 @@ import * as DetectRTC from "detectrtc"
   styleUrls: ['./input-config.component.scss']
 })
 export class InputConfigComponent implements OnInit {
-  public listMic: Array<IMediaDeviceInfo> = []
-  public listCamera: Array<IMediaDeviceInfo> = []
-  public listSpeaker: Array<IMediaDeviceInfo> = []
-  private localStream: MediaStream | null = null
+  public listMic: Array<Device> = []
+  public listCamera: Array<Device> = []
+  public listSpeaker: Array<Device> = []
+  public localStream: MediaStream | null = null;
+  public micFormControl = new FormControl('', Validators.required,)
+  public cameraFormControl = new FormControl('', Validators.required,)
+  public speakerFormControl = new FormControl('', Validators.required,)
   constructor() { }
 
   ngOnInit(): void {
     const self = this;
-    const constraints = {
+    const constraints: MediaStreamConstraints = {
       audio: false,
       video: false,
     };
     DetectRTC.load(function () {
-      console.log(DetectRTC)
+      console.log(JSON.parse(JSON.stringify(DetectRTC)))
       // has all permission
       if (DetectRTC.isWebsiteHasMicrophonePermissions && DetectRTC.isWebsiteHasWebcamPermissions) {
         self.refreshListInput()
       } else {
 
-        // just incase
-        self.refreshListInput()
         if (DetectRTC.isWebsiteHasMicrophonePermissions) {
           // doesn't as microphone permission
           constraints.audio = true
@@ -49,51 +51,93 @@ export class InputConfigComponent implements OnInit {
 
   }
 
-  async refreshListInput() {
-    const self = this;
-    const mediaDeviceInfo: MediaDeviceInfo[] = await navigator.mediaDevices.enumerateDevices()
-    console.log(mediaDeviceInfo)
-    if (mediaDeviceInfo) {
-      mediaDeviceInfo.forEach(function (item) {
-        if (item.kind === 'audioinput') {
-          // mic
-          self.listMic.push({
-            ...item,
-            label: item.label || `microphone ${self.listMic.length + 1}`,
-          })
-        } else if (item.kind === 'videoinput') {
-          // cam
-          self.listCamera.push({
-            ...item,
-            label: item.label || `camera ${self.listMic.length + 1}`,
-          })
-        } else if (item.kind === 'audiooutput') {
-          // speaker
-          self.listSpeaker.push({
-            ...item,
-            label: item.label || `speaker ${self.listMic.length + 1}`,
-          })
-        }
-      })
-    } else {
+  __onChooseMic(event) {
+    const activeIndex = this.micFormControl.value;
+    const selectedMic: Device = this.listMic[activeIndex]
+    console.log('__onChooseMic', activeIndex, selectedMic)
+    if (selectedMic) {
+      if (selectedMic.isCustomLabel) {
+        // user change mic but not allow permission to mic
+      } else {
 
+      }
+    } else {
+      // selected mic not found
     }
   }
 
-  askForUserMedia(constraints: MediaStreamConstraints) {
-    navigator.mediaDevices.getUserMedia(constraints)
-      .then(function (stream: MediaStream) {
-        console.log(stream)
-      }).catch(function (error) {
-        console.error('getUserMedia', error)
-        // click close: DOMException: Permission dismissed
-        // click block: DOMException: Permission denied
-      })
+  __onChooseCamera(event) {
+    const activeIndex = this.cameraFormControl.value;
+    const selectedCamera: Device = this.listCamera[activeIndex]
+    console.log('__onChooseCamera', activeIndex, selectedCamera)
+    if (selectedCamera) {
+      if (selectedCamera.isCustomLabel) {
+        // user change mic but not allow permission to mic
+      } else {
+
+      }
+    } else {
+      // selected mic not found
+    }
+  }
+
+  __onChooseSpeaker(event) {
+    const activeIndex = this.speakerFormControl.value;
+    const selectedSpeaker: Device = this.listSpeaker[activeIndex]
+    console.log('__onChooseSpeaker', activeIndex, selectedSpeaker)
+    if (selectedSpeaker) {
+      if (selectedSpeaker.isCustomLabel) {
+        // user change mic but not allow permission to mic
+      } else {
+
+      }
+    } else {
+      // selected mic not found
+    }
+  }
+
+
+  async refreshListInput() {
+
+    const self = this;
+    // refresh all list
+    this.listMic = []
+    this.listCamera = []
+    this.listSpeaker = []
+    DetectRTC.load(function () {
+      console.log(JSON.parse(JSON.stringify(DetectRTC)))
+
+      self.listMic = DetectRTC.audioInputDevices
+      self.listCamera = DetectRTC.audioOutputDevices
+      self.listSpeaker = DetectRTC.videoInputDevices
+    })
+  }
+
+  async askForUserMedia(constraints: MediaStreamConstraints) {
+    try {
+      const stream: MediaStream = await navigator.mediaDevices.getUserMedia(constraints)
+
+      this.localStream = stream
+
+      this.refreshListInput()
+    } catch (error) {
+      console.error('getUserMedia', error.name, error.code)
+      this.refreshListInput()
+      // click close: DOMException: Permission dismissed
+      // click block: DOMException: Permission denied
+    }
   }
 
 }
 
-
-export interface IMediaDeviceInfo extends MediaDeviceInfo {
-  label: string
+/**
+ * copy from node_modules/detectrtc/DetectRTC.d.ts
+ */
+export interface Device {
+  deviceId: string;
+  groupId: string;
+  id: string;
+  isCustomLabel?: boolean;
+  kind: string;
+  label: string;
 }

@@ -1,34 +1,34 @@
-<section>
-    <label class="section-label">Video</label>
-    <div>
-        <mat-form-field appearance="fill">
-            <mat-label>Audio input source</mat-label>
-            <mat-select>
-                <mat-option *ngFor="let item of listMic">{{ item.label }}</mat-option>
+<section align="center">
+    <label class="section-label">Mic</label>
+    <div class="section-content">
+        <mat-form-field appearance="fill" class="mat-form-field">
+            <mat-label>Choose audio input source</mat-label>
+            <mat-select (selectionChange)="__onChooseMic($event)" [formControl]="micFormControl">
+                <mat-option *ngFor="let item of listMic, index as index" [value]="index">{{ item.label }}</mat-option>
             </mat-select>
         </mat-form-field>
     </div>
 </section>
 <mat-divider></mat-divider>
-<section>
-    <label class="section-label">Video</label>
-    <div>
-        <mat-form-field appearance="fill">
-            <mat-label>Audio output destination</mat-label>
-            <mat-select>
-                <mat-option *ngFor="let item of listCamera">{{ item.label }}</mat-option>
+<section align="center">
+    <label class="section-label">Speaker & headphone</label>
+    <div class="section-content">
+        <mat-form-field appearance="fill" class="mat-form-field">
+            <mat-label>Choose audio output destination</mat-label>
+            <mat-select (selectionChange)="__onChooseCamera($event)" [formControl]="cameraFormControl">
+                <mat-option *ngFor="let item of listCamera, index as index" [value]="index">{{ item.label }}</mat-option>
             </mat-select>
         </mat-form-field>
     </div>
 </section>
 <mat-divider></mat-divider>
-<section>
-    <label class="section-label">Video</label>
-    <div>
-        <mat-form-field appearance="fill">
-            <mat-label>Video source</mat-label>
-            <mat-select>
-                <mat-option *ngFor="let item of listSpeaker">{{ item.label }}</mat-option>
+<section align="center">
+    <label class="section-label">Camera</label>
+    <div class="section-content">
+        <mat-form-field appearance="fill" class="mat-form-field">
+            <mat-label>Choose video source</mat-label>
+            <mat-select (selectionChange)="__onChooseSpeaker($event)" [formControl]="speakerFormControl">
+                <mat-option *ngFor="let item of listSpeaker, index as index" [value]="index">{{ item.label }}</mat-option>
             </mat-select>
         </mat-form-field>
     </div>
