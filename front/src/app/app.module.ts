@@ -11,13 +11,15 @@ import { HomepageComponent } from './page/homepage/homepage.component';
 import { InputConfigComponent } from './component/input-config/input-config.component';
 import { VideoStreamComponent } from './component/video-stream/video-stream.component';
 import { MaterialModule } from './module/material/material.module';
+import { AllSettingComponent } from './component/all-setting/all-setting.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     HomepageComponent,
     InputConfigComponent,
-    VideoStreamComponent
+    VideoStreamComponent,
+    AllSettingComponent
   ],
   imports: [
     BrowserModule,
