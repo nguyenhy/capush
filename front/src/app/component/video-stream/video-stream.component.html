@@ -1,1 +1,6 @@
-<p>video-stream works!</p>
+<ng-container *ngIf="hasStream">
+    <video playsinline autoplay></video>
+</ng-container>
+<ng-container *ngIf="!hasStream">
+    empty
+</ng-container>

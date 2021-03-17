@@ -1,7 +1,8 @@
-import { Component, OnInit, ElementRef, ChangeDetectorRef } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
+import { MatSelectChange } from '@angular/material/select';
 /* package */
-import * as DetectRTC from "detectrtc"
+import { IDevice, InputConfigService } from 'src/app/service/input-config/input-config.service';
 
 @Component({
   selector: 'app-input-config',
@@ -9,93 +10,68 @@ import * as DetectRTC from "detectrtc"
   styleUrls: ['./input-config.component.scss']
 })
 export class InputConfigComponent implements OnInit {
-  public listMic: Array<Device> = []
-  public listCamera: Array<Device> = []
-  public listSpeaker: Array<Device> = []
-  public localStream: MediaStream | null = null;
-  public micFormControl = new FormControl(0, Validators.required,)
-  public cameraFormControl = new FormControl(0, Validators.required,)
-  public speakerFormControl = new FormControl(0, Validators.required,)
-  constructor(
-    private ElementRef: ElementRef,
-    private ChangeDetectorRef: ChangeDetectorRef,
-  ) {
+  public listMic: Array<IDevice> = []
+  public listCamera: Array<IDevice> = []
+  public listSpeaker: Array<IDevice> = []
 
+  public micFormControl = new FormControl(0, Validators.required)
+  public cameraFormControl = new FormControl(0, Validators.required)
+  public speakerFormControl = new FormControl(0, Validators.required)
+
+
+  constructor(
+    private InputConfigService: InputConfigService
+  ) {
   }
 
   ngOnInit(): void {
     const self = this;
-
-    const constraints: MediaStreamConstraints = {
-      audio: false,
-      video: false,
-    };
-    DetectRTC.load(function () {
-      console.log(JSON.parse(JSON.stringify(DetectRTC)))
-      // has all permission
-      if (DetectRTC.isWebsiteHasMicrophonePermissions && DetectRTC.isWebsiteHasWebcamPermissions) {
-        self.refreshListInput()
-      } else {
-
-        if (DetectRTC.isWebsiteHasMicrophonePermissions) {
-          // doesn't as microphone permission
-          constraints.audio = true
-
-        } else if (DetectRTC.isWebsiteHasWebcamPermissions) {
-          // doesn't as webcam permission
-          constraints.video = true
-
-        } else {
-          // doesn't as any permission
-          constraints.audio = true
-          constraints.video = true
-
-        }
-        self.askForUserMedia(constraints)
-      }
-    })
+    this.InputConfigService.initService()
+    this.subscribeListMediaChange()
 
   }
 
-  __onChooseMic(event) {
+  __onChooseMic(event: MatSelectChange) {
     const activeIndex = event.value;
-    const selectedMic: Device = this.listMic[activeIndex]
+    const selectedMic: IDevice = this.listMic[activeIndex]
     console.log('__onChooseMic', activeIndex, selectedMic)
     if (selectedMic) {
       if (selectedMic.isCustomLabel) {
         // user change mic but not allow permission to mic
       } else {
-        this.updateMicStream()
+        this.InputConfigService.stopAllTrack()
+        this.InputConfigService.requestUserMedia()
       }
     } else {
       // selected mic not found
     }
   }
 
-  __onChooseCamera(event) {
+  __onChooseCamera(event: MatSelectChange) {
     const activeIndex = event.value;
-    const selectedCamera: Device = this.listCamera[activeIndex]
+    const selectedCamera: IDevice = this.listCamera[activeIndex]
     console.log('__onChooseCamera', activeIndex, selectedCamera)
     if (selectedCamera) {
       if (selectedCamera.isCustomLabel) {
         // user change camera but not allow permission to camera
       } else {
-        this.updateCameraStream(selectedCamera)
+        this.InputConfigService.stopAllTrack()
+        this.InputConfigService.requestUserMedia()
       }
     } else {
       // selected camera not found
     }
   }
 
-  __onChooseSpeaker(event) {
+  __onChooseSpeaker(event: MatSelectChange) {
     const activeIndex = event.value;
-    const selectedSpeaker: Device = this.listSpeaker[activeIndex]
+    const selectedSpeaker: IDevice = this.listSpeaker[activeIndex]
     console.log('__onChooseSpeaker', activeIndex, selectedSpeaker)
     if (selectedSpeaker) {
       if (selectedSpeaker.isCustomLabel) {
         // user change speaker but not allow permission to speaker
       } else {
-        this.updateSpeaker()
+
       }
     } else {
       // selected speaker not found
@@ -103,105 +79,26 @@ export class InputConfigComponent implements OnInit {
   }
 
 
-  async refreshListInput() {
-
+  async subscribeListMediaChange() {
     const self = this;
-    // refresh all list
-    this.listMic = []
-    this.listCamera = []
-    this.listSpeaker = []
-    DetectRTC.load(function () {
-      console.log(JSON.parse(JSON.stringify(DetectRTC)))
 
-      self.listMic = DetectRTC.audioInputDevices
-      self.listCamera = DetectRTC.videoInputDevices
-      self.listSpeaker = DetectRTC.audioOutputDevices
+    this.InputConfigService.listMicObservable.subscribe(function (listMic) {
+      self.listMic = listMic;
     })
-  }
 
-  async askForUserMedia(constraints: MediaStreamConstraints) {
-    try {
-      const stream: MediaStream = await navigator.mediaDevices.getUserMedia(constraints)
+    this.InputConfigService.listCameraObservable.subscribe(function (listCamera) {
+      self.listCamera = listCamera;
+    })
 
-      this.localStream = stream
-      this.ChangeDetectorRef.detectChanges()
+    this.InputConfigService.listSpeakerObservable.subscribe(function (listSpeaker) {
+      self.listSpeaker = listSpeaker;
+    })
 
-      this.refreshListInput()
-      return stream
-    } catch (error) {
-      console.error('getUserMedia', error.name, error.code)
-      this.refreshListInput()
-      // click close: DOMException: Permission dismissed
-      // click block: DOMException: Permission denied
-      return null
-    }
+    this.InputConfigService.listSpeakerObservable.subscribe(function () {
+
+    })
+
   }
 
 
-  async updateMicStream() {
-    if (this.localStream) {
-      const track = this.localStream.getTracks()
-      if (track && track.length) {
-        track.forEach(function (item) {
-          item.stop()
-        })
-      }
-    }
-
-    const constraints: MediaStreamConstraints = {
-      audio: true,
-      video: true,
-    };
-    const stream = await this.askForUserMedia(constraints)
-    const nativeElement = this.ElementRef.nativeElement as HTMLElement
-    const $videoElement: HTMLVideoElement | null = nativeElement.querySelector('video')
-    if ($videoElement) {
-      $videoElement.srcObject = stream
-    }
-  }
-
-  async updateCameraStream(device: Device) {
-    if (this.localStream) {
-      const track = this.localStream.getTracks()
-      if (track && track.length) {
-        track.forEach(function (item) {
-          item.stop()
-        })
-      }
-    }
-
-    const constraints: MediaStreamConstraints = {
-      video: {
-        deviceId: {
-          exact: device.deviceId
-        }
-      },
-    };
-    const stream = await this.askForUserMedia(constraints)
-
-    const nativeElement = this.ElementRef.nativeElement as HTMLElement
-    const $videoElement: HTMLVideoElement | null = nativeElement.querySelector('video')
-    if ($videoElement) {
-      $videoElement.srcObject = stream
-    }
-  }
-
-  updateSpeaker() {
-    if (!this.localStream) {
-      return
-    }
-  }
-
-}
-
-/**
- * copy from node_modules/detectrtc/DetectRTC.d.ts
- */
-export interface Device {
-  deviceId: string;
-  groupId: string;
-  id: string;
-  isCustomLabel?: boolean;
-  kind: string;
-  label: string;
 }
