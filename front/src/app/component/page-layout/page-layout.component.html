@@ -1,0 +1,33 @@
+<mat-drawer-container autosize class="mat-drawer-container">
+    <mat-drawer class="mat-drawer" mode="over" opened #drawer>
+        <div class="menu-container">
+            <a class="menu-item top" mat-button routerlink="/">Capush</a>
+            <div class="mat-selection-list">
+                <mat-nav-list>
+                    <a class="menu-item nav" mat-list-item *ngFor="let item of listMenu" href="{{ item.href }}">
+                        <mat-icon class="mat-icon" aria-hidden="false" matTooltip="item.title">{{ item.icon }}</mat-icon>
+                        <span class="menu-name">{{ item.text }}</span>
+                    </a>
+                </mat-nav-list>
+            </div>
+            <button mat-button class="menu-item bottom" aria-label="Settings" matTooltip="Toggle Settings">
+                <mat-icon class="mat-icon">settings</mat-icon>
+                <span class="menu-name">Settings</span>
+            </button>
+        </div>
+    </mat-drawer>
+    <mat-drawer-content class="mat-drawer-content">
+        <mat-toolbar class="mat-toolbar">
+            <button mat-icon-button class="example-icon" aria-label="Toggle left-side menu" (click)="drawer.toggle()">
+                <mat-icon>menu</mat-icon>
+            </button>
+            <header>{{ pageInfo?.title }}</header>
+            <button mat-icon-button class="example-icon" aria-label="Notifications">
+                <mat-icon>notifications</mat-icon>
+            </button>
+        </mat-toolbar>
+        <div class="main-content">
+            <ng-content select="app-content"></ng-content>
+        </div>
+    </mat-drawer-content>
+</mat-drawer-container>

@@ -12,14 +12,16 @@ import { InputConfigComponent } from './component/input-config/input-config.comp
 import { VideoStreamComponent } from './component/video-stream/video-stream.component';
 import { MaterialModule } from './module/material/material.module';
 import { AllSettingComponent } from './component/all-setting/all-setting.component';
-
+import { CommonModule, LocationStrategy, PathLocationStrategy } from '@angular/common';
+import { PageLayoutComponent } from './component/page-layout/page-layout.component';
 @NgModule({
   declarations: [
     AppComponent,
     HomepageComponent,
     InputConfigComponent,
     VideoStreamComponent,
-    AllSettingComponent
+    AllSettingComponent,
+    PageLayoutComponent
   ],
   imports: [
     BrowserModule,
@@ -27,8 +29,12 @@ import { AllSettingComponent } from './component/all-setting/all-setting.compone
     BrowserAnimationsModule,
     MaterialModule,
     ReactiveFormsModule,
+    CommonModule,
   ],
-  providers: [],
+  providers: [
+    Location,
+    { provide: LocationStrategy, useClass: PathLocationStrategy }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

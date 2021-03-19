@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-all-setting',
@@ -7,9 +8,14 @@ import { Component, OnInit } from '@angular/core';
 })
 export class AllSettingComponent implements OnInit {
 
-  constructor() { }
+  constructor(
+    private MatDialog: MatDialog,
+  ) {
+
+  }
 
   ngOnInit(): void {
+    
   }
 
 }
