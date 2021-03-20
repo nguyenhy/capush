@@ -17,12 +17,12 @@
         </div>
     </mat-drawer>
     <mat-drawer-content class="mat-drawer-content">
-        <mat-toolbar class="mat-toolbar">
+        <mat-toolbar class="mat-toolbar" color="primary">
             <button mat-icon-button class="example-icon" aria-label="Toggle left-side menu" (click)="drawer.toggle()">
                 <mat-icon>menu</mat-icon>
             </button>
             <header>{{ pageInfo?.title }}</header>
-            <button mat-icon-button class="example-icon" aria-label="Notifications">
+            <button mat-icon-button [matBadge]="totalUnreadNoify" [matBadgeHidden]="totalUnreadNoify === 0" matBadgeSize="medium" matBadgeColor="accent" aria-label="Notifications">
                 <mat-icon>notifications</mat-icon>
             </button>
         </mat-toolbar>

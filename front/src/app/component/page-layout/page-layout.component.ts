@@ -1,5 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { NotificationService } from 'src/app/service/notification/notification.service';
 import { IMenuItem, PageInfoService } from 'src/app/service/page-info/page-info.service';
 
 @Component({
@@ -10,10 +11,13 @@ import { IMenuItem, PageInfoService } from 'src/app/service/page-info/page-info.
 export class PageLayoutComponent implements OnInit {
   @Input() pageInfo: IMenuItem | null = null
   @Input() pagePath: string = '';
+  
+  totalUnreadNoify: number = 0
   listMenu: Array<IMenuItem> = []
   constructor(
     private router: Router,
-    private PageInfoService: PageInfoService
+    private PageInfoService: PageInfoService,
+    private NotificationService: NotificationService,
   ) {
 
   }
@@ -30,6 +34,12 @@ export class PageLayoutComponent implements OnInit {
     }
 
     this.listMenu = this.PageInfoService.get_list_menu();
+
+    this.NotificationService.initService()
+    
+    this.NotificationService.onNotifyChange.subscribe(() => {
+      this.totalUnreadNoify = this.NotificationService.totalUnreadNoify
+    })
   }
 
 }
