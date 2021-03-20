@@ -14,6 +14,8 @@ import { MaterialModule } from './module/material/material.module';
 import { AllSettingComponent } from './component/all-setting/all-setting.component';
 import { CommonModule, LocationStrategy, PathLocationStrategy } from '@angular/common';
 import { PageLayoutComponent } from './component/page-layout/page-layout.component';
+import { SettingsComponent } from './page/settings/settings.component';
+import { InputOutputComponent } from './page/input-output/input-output.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -21,7 +23,9 @@ import { PageLayoutComponent } from './component/page-layout/page-layout.compone
     InputConfigComponent,
     VideoStreamComponent,
     AllSettingComponent,
-    PageLayoutComponent
+    PageLayoutComponent,
+    SettingsComponent,
+    InputOutputComponent
   ],
   imports: [
     BrowserModule,
