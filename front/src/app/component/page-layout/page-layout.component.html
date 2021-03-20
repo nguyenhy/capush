@@ -1,19 +1,19 @@
 <mat-drawer-container autosize class="mat-drawer-container">
-    <mat-drawer class="mat-drawer" mode="over" opened #drawer>
+    <mat-drawer class="mat-drawer" mode="over" #drawer>
         <div class="menu-container">
-            <a class="menu-item top" mat-button routerlink="/">Capush</a>
+            <a class="menu-item top" mat-button href="/">Capush</a>
             <div class="mat-selection-list">
                 <mat-nav-list>
-                    <a class="menu-item nav" mat-list-item *ngFor="let item of listMenu" href="{{ item.href }}">
+                    <a class="menu-item nav" mat-list-item *ngFor="let item of listMenu" href="{{ item.path }}">
                         <mat-icon class="mat-icon" aria-hidden="false" matTooltip="item.title">{{ item.icon }}</mat-icon>
                         <span class="menu-name">{{ item.text }}</span>
                     </a>
                 </mat-nav-list>
             </div>
-            <button mat-button class="menu-item bottom" aria-label="Settings" matTooltip="Toggle Settings">
+            <a mat-button class="menu-item bottom" aria-label="Settings" matTooltip="Toggle Settings" href="/settings">
                 <mat-icon class="mat-icon">settings</mat-icon>
                 <span class="menu-name">Settings</span>
-            </button>
+            </a>
         </div>
     </mat-drawer>
     <mat-drawer-content class="mat-drawer-content">
