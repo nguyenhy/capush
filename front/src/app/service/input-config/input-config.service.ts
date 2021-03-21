@@ -63,8 +63,26 @@ export class InputConfigService {
 
       return stream
     } catch (error) {
+      //log to console first 
       console.error('getUserMedia', error.name, error.code, error)
-      
+
+      /**
+       * add error handle suggest from [here](https://blog.addpipe.com/common-getusermedia-errors/)
+       */
+      if (error.name == "NotFoundError" || error.name == "DevicesNotFoundError") {
+        //required track is missing 
+      } else if (error.name == "NotReadableError" || error.name == "TrackStartError") {
+        //webcam or mic are already in use 
+      } else if (error.name == "OverconstrainedError" || error.name == "ConstraintNotSatisfiedError") {
+        //constraints can not be satisfied by avb. devices 
+      } else if (error.name == "NotAllowedError" || error.name == "PermissionDeniedError") {
+        //permission denied in browser 
+      } else if (error.name == "TypeError" || error.name == "TypeError") {
+        //empty constraints object 
+      } else {
+        //other errors 
+      }
+
       this.refreshListMediaDevice()
       this.localStreamBehaviorSubject.next(null)
       return null
