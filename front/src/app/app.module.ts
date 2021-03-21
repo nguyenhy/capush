@@ -11,21 +11,21 @@ import { HomepageComponent } from './page/homepage/homepage.component';
 import { InputConfigComponent } from './component/input-config/input-config.component';
 import { VideoStreamComponent } from './component/video-stream/video-stream.component';
 import { MaterialModule } from './module/material/material.module';
-import { AllSettingComponent } from './component/all-setting/all-setting.component';
 import { CommonModule, LocationStrategy, PathLocationStrategy } from '@angular/common';
 import { PageLayoutComponent } from './component/page-layout/page-layout.component';
 import { SettingsComponent } from './page/settings/settings.component';
 import { InputOutputComponent } from './page/input-output/input-output.component';
+import { InputMediaComponent } from './component/input-config/input-device/input-device.component';
 @NgModule({
   declarations: [
     AppComponent,
     HomepageComponent,
     InputConfigComponent,
     VideoStreamComponent,
-    AllSettingComponent,
     PageLayoutComponent,
     SettingsComponent,
-    InputOutputComponent
+    InputOutputComponent,
+    InputMediaComponent
   ],
   imports: [
     BrowserModule,

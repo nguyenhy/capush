@@ -1,3 +1,23 @@
+.menu-section {
+    &.mic {
+    }
+    &.cam {
+    }
+    &.speaker {
+    }
+
+    .section-content {
+        display: flex;
+        flex-direction: row;
+    }
+
+    .select {
+        width: 40%;
+    }
+    .media {
+        width: 60%;
+    }
+}
 .section-label {
     display: block;
     margin-top: 5px;
