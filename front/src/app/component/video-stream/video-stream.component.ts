@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, Input, OnInit } from '@angular/core';
 import * as DetectRTC from 'detectrtc';
 import { IDevice, InputConfigService } from 'src/app/service/input-config/input-config.service';
 
@@ -10,6 +10,7 @@ import { IDevice, InputConfigService } from 'src/app/service/input-config/input-
 export class VideoStreamComponent implements OnInit {
   hasStream: boolean = false
   constructor(
+    private ChangeDetectorRef: ChangeDetectorRef,
     private ElementRef: ElementRef,
     private InputConfigService: InputConfigService
   ) { }
@@ -29,6 +30,7 @@ export class VideoStreamComponent implements OnInit {
 
   updateStream(mediaStream: MediaStream | null) {
     this.hasStream = !!mediaStream
+    this.ChangeDetectorRef.detectChanges()
     if (mediaStream) {
       const nativeElement = this.ElementRef.nativeElement as HTMLElement
       const $videoElement: HTMLVideoElement | null = nativeElement.querySelector('video')
