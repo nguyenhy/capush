@@ -105,8 +105,8 @@ export class InputConfigService {
 
   async loadSavedUserMedia(option: IInitServiceOption) {
     const constraints: MediaStreamConstraints = {};
-    constraints.audio = true; // this.getAudioConstraint(option.inputAudio)
-    constraints.video = true; // this.getVideoConstraint(option.inputVideo)
+    constraints.audio = this.getAudioConstraint(option.inputAudio)
+    constraints.video = this.getVideoConstraint(option.inputVideo)
 
     this.stopAllTrack()
 
