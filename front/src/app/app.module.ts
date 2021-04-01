@@ -15,7 +15,7 @@ import { CommonModule, LocationStrategy, PathLocationStrategy } from '@angular/c
 import { PageLayoutComponent } from './component/page-layout/page-layout.component';
 import { SettingsComponent } from './page/settings/settings.component';
 import { InputOutputComponent } from './page/input-output/input-output.component';
-import { InputMediaComponent } from './component/input-config/input-device/input-device.component';
+import { MatSelectComponent } from './component/mat-select/mat-select.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -25,7 +25,7 @@ import { InputMediaComponent } from './component/input-config/input-device/input
     PageLayoutComponent,
     SettingsComponent,
     InputOutputComponent,
-    InputMediaComponent
+    MatSelectComponent
   ],
   imports: [
     BrowserModule,

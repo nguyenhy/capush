@@ -5,7 +5,7 @@ import * as DetectRTC from 'detectrtc';
 /* package */
 import { IDevice, InputConfigService } from 'src/app/service/input-config/input-config.service';
 import { EStorage, LocalStorageService } from 'src/app/service/local-storage/local-storage.service';
-import { InputMediaComponent } from './input-device/input-device.component';
+import { MatSelectComponent } from '../mat-select/mat-select.component';
 
 @Component({
   selector: 'app-input-config',
@@ -20,9 +20,9 @@ export class InputConfigComponent implements OnInit, AfterViewInit {
 
   public videoMediaStream: MediaStream | null = null
 
-  @ViewChild('mediaDeviceMic') mediaDeviceMic!: InputMediaComponent;
-  @ViewChild('mediaDeviceCam') mediaDeviceCam!: InputMediaComponent;
-  @ViewChild('mediaDeviceSpeaker') mediaDeviceSpeaker!: InputMediaComponent;
+  @ViewChild('mediaDeviceMic') mediaDeviceMic!: MatSelectComponent<IDevice>;
+  @ViewChild('mediaDeviceCam') mediaDeviceCam!: MatSelectComponent<IDevice>;
+  @ViewChild('mediaDeviceSpeaker') mediaDeviceSpeaker!: MatSelectComponent<IDevice>;
   constructor(
     private InputConfigService: InputConfigService,
     private LocalStorageService: LocalStorageService,
@@ -49,15 +49,27 @@ export class InputConfigComponent implements OnInit, AfterViewInit {
   }
 
   __onChooseMic(device: IDevice) {
-    this.InputConfigService.requestUserMedia(device)
+    if (device.isCustomLabel) {
+      // user change camera but not allow permission to camera
+    } else {
+      this.InputConfigService.requestUserMedia(device)
+    }
   }
 
   __onChooseCamera(device: IDevice) {
-    this.InputConfigService.requestUserMedia(device)
+    if (device.isCustomLabel) {
+      // user change camera but not allow permission to camera
+    } else {
+      this.InputConfigService.requestUserMedia(device)
+    }
   }
 
   __onChooseSpeaker(device: IDevice) {
-    this.InputConfigService.requestUserMedia(device)
+    if (device.isCustomLabel) {
+      // user change camera but not allow permission to camera
+    } else {
+      this.InputConfigService.requestUserMedia(device)
+    }
   }
 
 

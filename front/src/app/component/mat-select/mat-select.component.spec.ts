@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { InputMediaComponent } from './input-device.component';
+import { MatSelectComponent } from './mat-select.component';
 
-describe('InputMediaComponent', () => {
-  let component: InputMediaComponent;
-  let fixture: ComponentFixture<InputMediaComponent>;
+describe('MatSelectComponent', () => {
+  let component: MatSelectComponent<any>;
+  let fixture: ComponentFixture<MatSelectComponent<any>>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ InputMediaComponent ]
+      declarations: [MatSelectComponent]
     })
-    .compileComponents();
+      .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(InputMediaComponent);
+    fixture = TestBed.createComponent(MatSelectComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -4,17 +4,17 @@ import { MatSelectChange } from '@angular/material/select';
 import { IDevice } from 'src/app/service/input-config/input-config.service';
 
 @Component({
-  selector: 'app-input-device',
-  templateUrl: './input-device.component.html',
-  styleUrls: ['./input-device.component.scss']
+  selector: 'app-mat-select',
+  templateUrl: './mat-select.component.html',
+  styleUrls: ['./mat-select.component.scss']
 })
-export class InputMediaComponent implements OnInit {
+export class MatSelectComponent<T> implements OnInit {
   /* input */
-  @Input() listDevice: Array<IDevice> = []
+  @Input() listOption: Array<T> = []
   @Input() fieldLabel: string = '';
 
   /* output */
-  @Output() onChange: EventEmitter<IDevice> = new EventEmitter()
+  @Output() onChange: EventEmitter<T> = new EventEmitter()
 
   formControl = new FormControl(0, Validators.required)
   constructor(
@@ -26,15 +26,11 @@ export class InputMediaComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  __onChooseDevice(event: MatSelectChange) {
+  __onChooseOption(event: MatSelectChange) {
     const activeIndex = event.value;
-    const selectedCamera: IDevice = this.listDevice[activeIndex]
+    const selectedCamera: T = this.listOption[activeIndex]
     if (selectedCamera) {
-      if (selectedCamera.isCustomLabel) {
-        // user change camera but not allow permission to camera
-      } else {
-        this.onChange.emit(selectedCamera)
-      }
+      this.onChange.emit(selectedCamera)
     } else {
       // selected camera not found
     }
