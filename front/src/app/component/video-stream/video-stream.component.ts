@@ -9,6 +9,7 @@ import { IDevice, InputConfigService } from 'src/app/service/input-config/input-
 })
 export class VideoStreamComponent implements OnInit {
   hasStream: boolean = false
+  mediaStream: MediaStream | null = null
   constructor(
     private ChangeDetectorRef: ChangeDetectorRef,
     private ElementRef: ElementRef,
@@ -18,14 +19,6 @@ export class VideoStreamComponent implements OnInit {
   ngOnInit(): void {
     const self = this;
 
-    this.updateStream(this.InputConfigService.getCurrentStream())
-
-    this.InputConfigService.localStreamObservable.subscribe((mediaStream) => {
-      this.updateStream(mediaStream)
-    })
-    this.InputConfigService.outputAudioObservable.subscribe((device) => {
-      this.setSinkId(device)
-    })
   }
 
   updateStream(mediaStream: MediaStream | null) {
@@ -35,6 +28,8 @@ export class VideoStreamComponent implements OnInit {
       const nativeElement = this.ElementRef.nativeElement as HTMLElement
       const $videoElement: HTMLVideoElement | null = nativeElement.querySelector('video')
       if ($videoElement) {
+        this.stopAllTrack()
+
         $videoElement.srcObject = mediaStream
       }
     } else {
@@ -56,6 +51,19 @@ export class VideoStreamComponent implements OnInit {
       }
     } else {
 
+    }
+  }
+
+  stopAllTrack() {
+    if (!this.mediaStream) {
+      return
+    }
+
+    const track = this.mediaStream.getTracks()
+    if (track && track.length) {
+      track.forEach(function (item) {
+        item.stop()
+      })
     }
   }
 
