@@ -8,7 +8,7 @@ import { IDevice } from 'src/app/service/input-config/input-config.service';
   templateUrl: './mat-select.component.html',
   styleUrls: ['./mat-select.component.scss']
 })
-export class MatSelectComponent<T> implements OnInit {
+export class MatSelectComponent<T extends IMatSelectItem> implements OnInit {
   /* input */
   @Input() listOption: Array<T> = []
   @Input() fieldLabel: string = '';
@@ -17,6 +17,7 @@ export class MatSelectComponent<T> implements OnInit {
   @Output() onChange: EventEmitter<T> = new EventEmitter()
 
   formControl = new FormControl(0, Validators.required)
+
   constructor(
 
   ) {
@@ -26,7 +27,8 @@ export class MatSelectComponent<T> implements OnInit {
   ngOnInit(): void {
   }
 
-  __onChooseOption(event: MatSelectChange) {
+  /* view handler */
+  public __onChooseOption(event: MatSelectChange) {
     const activeIndex = event.value;
     const selectedCamera: T = this.listOption[activeIndex]
     if (selectedCamera) {
@@ -35,4 +37,14 @@ export class MatSelectComponent<T> implements OnInit {
       // selected camera not found
     }
   }
+
+  /* public method */
+  public setValue(index: number) {
+    this.formControl.setValue(index)
+  }
+
+}
+
+export interface IMatSelectItem {
+  label: string
 }
