@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { AllSettingComponent } from './all-setting.component';
+import { InputMediaComponent } from './input-device.component';
 
-describe('AllSettingComponent', () => {
-  let component: AllSettingComponent;
-  let fixture: ComponentFixture<AllSettingComponent>;
+describe('InputMediaComponent', () => {
+  let component: InputMediaComponent;
+  let fixture: ComponentFixture<InputMediaComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ AllSettingComponent ]
+      declarations: [ InputMediaComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(AllSettingComponent);
+    fixture = TestBed.createComponent(InputMediaComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

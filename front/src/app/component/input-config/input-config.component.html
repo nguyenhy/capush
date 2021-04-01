@@ -1,36 +1,41 @@
-<section align="center">
+<section class="menu-section mic" align="center">
     <label class="section-label">Mic</label>
     <div class="section-content">
-        <mat-form-field appearance="fill" class="mat-form-field">
-            <mat-label>Choose audio input source</mat-label>
-            <mat-select (selectionChange)="__onChooseMic($event)" [formControl]="micFormControl">
-                <mat-option *ngFor="let item of listMic, index as index" [value]="index">{{ item.label }}</mat-option>
-            </mat-select>
-        </mat-form-field>
+        <div class="select">
+            <app-input-device #mediaDeviceMic [fieldLabel]="'Choose audio input source'" [listDevice]="listMic" (onChange)="__onChooseMic($event)">
+            </app-input-device>
+        </div>
+        <div class="media">
+
+        </div>
     </div>
 </section>
 <mat-divider></mat-divider>
-<section align="center">
-    <label class="section-label">Speaker & headphone</label>
-    <div class="section-content">
-        <mat-form-field appearance="fill" class="mat-form-field">
-            <mat-label>Choose audio output destination</mat-label>
-            <mat-select (selectionChange)="__onChooseSpeaker($event)" [formControl]="cameraFormControl">
-                <mat-option *ngFor="let item of listSpeaker, index as index" [value]="index">{{ item.label }}</mat-option>
-            </mat-select>
-        </mat-form-field>
-    </div>
-</section>
-<mat-divider></mat-divider>
-<section align="center">
+
+<section class="menu-section cam" align="center">
     <label class="section-label">Camera</label>
     <div class="section-content">
-        <mat-form-field appearance="fill" class="mat-form-field">
-            <mat-label>Choose video source</mat-label>
-            <mat-select (selectionChange)="__onChooseCamera($event)" [formControl]="speakerFormControl">
-                <mat-option *ngFor="let item of listCamera, index as index" [value]="index">{{ item.label }}</mat-option>
-            </mat-select>
-        </mat-form-field>
+        <div class="select">
+            <app-input-device #mediaDeviceCam [fieldLabel]="'Choose video source'" [listDevice]="listCamera" (onChange)="__onChooseCamera($event)">
+            </app-input-device>
+        </div>
+        <div class="media">
+            <app-video-stream></app-video-stream>
+        </div>
+    </div>
+</section>
+<mat-divider></mat-divider>
+
+<section class="menu-section speaker" align="center" *ngIf="supportChangeSpeaker">
+    <label class="section-label">Speaker & headphone</label>
+    <div class="section-content">
+        <div class="select">
+            <app-input-device #mediaDeviceSpeaker [fieldLabel]="'Choose audio output destination'" [listDevice]="listSpeaker" (onChange)="__onChooseSpeaker($event)">
+            </app-input-device>
+        </div>
+        <div class="media">
+
+        </div>
     </div>
 </section>
 <mat-divider></mat-divider>

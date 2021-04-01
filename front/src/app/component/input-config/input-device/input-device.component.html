@@ -1,0 +1,6 @@
+<mat-form-field appearance="fill" class="mat-form-field">
+    <mat-label>{{ fieldLabel }}</mat-label>
+    <mat-select (selectionChange)="__onChooseDevice($event)" [formControl]="formControl">
+        <mat-option *ngFor="let item of listDevice, index as index" [value]="index">{{ item.label }}</mat-option>
+    </mat-select>
+</mat-form-field>

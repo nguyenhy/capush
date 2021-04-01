@@ -1,6 +1,8 @@
-<ng-container *ngIf="hasStream">
-    <video playsinline autoplay></video>
-</ng-container>
-<ng-container *ngIf="!hasStream">
-    empty
-</ng-container>
+<div class="wrap">
+    <ng-container *ngIf="hasStream">
+        <video playsinline autoplay></video>
+    </ng-container>
+    <ng-container *ngIf="!hasStream">
+        <span>empty</span>
+    </ng-container>
+</div>

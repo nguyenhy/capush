@@ -1,104 +1,162 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { MatSelectChange } from '@angular/material/select';
+import * as DetectRTC from 'detectrtc';
 /* package */
 import { IDevice, InputConfigService } from 'src/app/service/input-config/input-config.service';
+import { EStorage, LocalStorageService } from 'src/app/service/local-storage/local-storage.service';
+import { InputMediaComponent } from './input-device/input-device.component';
 
 @Component({
   selector: 'app-input-config',
   templateUrl: './input-config.component.html',
   styleUrls: ['./input-config.component.scss']
 })
-export class InputConfigComponent implements OnInit {
+export class InputConfigComponent implements OnInit, AfterViewInit {
   public listMic: Array<IDevice> = []
   public listCamera: Array<IDevice> = []
   public listSpeaker: Array<IDevice> = []
+  public supportChangeSpeaker: boolean = false
 
-  public micFormControl = new FormControl(0, Validators.required)
-  public cameraFormControl = new FormControl(0, Validators.required)
-  public speakerFormControl = new FormControl(0, Validators.required)
+  public videoMediaStream: MediaStream | null = null
 
-
+  @ViewChild('mediaDeviceMic') mediaDeviceMic!: InputMediaComponent;
+  @ViewChild('mediaDeviceCam') mediaDeviceCam!: InputMediaComponent;
+  @ViewChild('mediaDeviceSpeaker') mediaDeviceSpeaker!: InputMediaComponent;
   constructor(
-    private InputConfigService: InputConfigService
+    private InputConfigService: InputConfigService,
+    private LocalStorageService: LocalStorageService,
   ) {
   }
 
   ngOnInit(): void {
     const self = this;
-    this.InputConfigService.initService()
-    this.subscribeListMediaChange()
+    this.supportChangeSpeaker = DetectRTC.isSetSinkIdSupported
+
 
   }
 
-  __onChooseMic(event: MatSelectChange) {
-    const activeIndex = event.value;
-    const selectedMic: IDevice = this.listMic[activeIndex]
-    console.log('__onChooseMic', activeIndex, selectedMic)
-    if (selectedMic) {
-      if (selectedMic.isCustomLabel) {
-        // user change mic but not allow permission to mic
-      } else {
-        this.InputConfigService.stopAllTrack()
-        this.InputConfigService.requestUserMedia()
-      }
-    } else {
-      // selected mic not found
-    }
+  ngAfterViewInit() {
+
+
+    DetectRTC.load(() => {
+      this.subscribeListMediaChange()
+      this.subscribeMediaDeviceChange()
+
+      this.loadSavedMediaDevice()
+    })
+
   }
 
-  __onChooseCamera(event: MatSelectChange) {
-    const activeIndex = event.value;
-    const selectedCamera: IDevice = this.listCamera[activeIndex]
-    console.log('__onChooseCamera', activeIndex, selectedCamera)
-    if (selectedCamera) {
-      if (selectedCamera.isCustomLabel) {
-        // user change camera but not allow permission to camera
-      } else {
-        this.InputConfigService.stopAllTrack()
-        this.InputConfigService.requestUserMedia()
-      }
-    } else {
-      // selected camera not found
-    }
+  __onChooseMic(device: IDevice) {
+    this.InputConfigService.requestUserMedia(device)
   }
 
-  __onChooseSpeaker(event: MatSelectChange) {
-    const activeIndex = event.value;
-    const selectedSpeaker: IDevice = this.listSpeaker[activeIndex]
-    console.log('__onChooseSpeaker', activeIndex, selectedSpeaker)
-    if (selectedSpeaker) {
-      if (selectedSpeaker.isCustomLabel) {
-        // user change speaker but not allow permission to speaker
-      } else {
-
-      }
-    } else {
-      // selected speaker not found
-    }
+  __onChooseCamera(device: IDevice) {
+    this.InputConfigService.requestUserMedia(device)
   }
 
+  __onChooseSpeaker(device: IDevice) {
+    this.InputConfigService.requestUserMedia(device)
+  }
+
+
+  async subscribeMediaDeviceChange() {
+    this.InputConfigService.inputAudioObservable.subscribe((device) => {
+      this.saveInputAudio(device)
+    })
+
+    this.InputConfigService.inputVideoObservable.subscribe((device) => {
+      this.saveInputVideo(device)
+    })
+
+    this.InputConfigService.outputAudioObservable.subscribe((device) => {
+      this.saveOutputVideo(device)
+    })
+  }
 
   async subscribeListMediaChange() {
     const self = this;
 
-    this.InputConfigService.listMicObservable.subscribe(function (listMic) {
+    this.InputConfigService.listMicObservable.subscribe((listMic) => {
       self.listMic = listMic;
     })
 
-    this.InputConfigService.listCameraObservable.subscribe(function (listCamera) {
+    this.InputConfigService.listCameraObservable.subscribe((listCamera) => {
       self.listCamera = listCamera;
     })
 
-    this.InputConfigService.listSpeakerObservable.subscribe(function (listSpeaker) {
+    this.InputConfigService.listSpeakerObservable.subscribe((listSpeaker) => {
       self.listSpeaker = listSpeaker;
     })
 
-    this.InputConfigService.listSpeakerObservable.subscribe(function () {
-
+    this.InputConfigService.localStreamObservable.subscribe((mediaStream) => {
+      this.videoMediaStream = mediaStream
     })
 
   }
+
+
+  saveInputAudio(device: IDevice | null) {
+    if (!device) {
+      return
+    }
+
+    this.LocalStorageService.set(EStorage.settingSelectedAudioInput, device)
+  }
+
+  saveInputVideo(device: IDevice | null) {
+    if (!device) {
+      return
+    }
+    this.LocalStorageService.set(EStorage.settingSelectedVideoInput, device)
+  }
+
+  saveOutputVideo(device: IDevice | null) {
+    if (!device) {
+      return
+    }
+    this.LocalStorageService.set(EStorage.settingSelectedAudioOutput, device)
+  }
+
+
+  async loadSavedMediaDevice() {
+    const inputVideo: IDevice | null = this.LocalStorageService.get(EStorage.settingSelectedVideoInput)
+    const inputAudio: IDevice | null = this.LocalStorageService.get(EStorage.settingSelectedAudioInput)
+    const outputAudio: IDevice | null = this.LocalStorageService.get(EStorage.settingSelectedAudioOutput)
+
+    this.InputConfigService.initService({
+      inputVideo,
+      inputAudio,
+      outputAudio,
+    })
+
+    if (inputAudio && this.mediaDeviceMic) {
+      const listMic = this.InputConfigService.getCurrentListMic()
+      const value = this.InputConfigService.findDeviceIndex(listMic, inputAudio)
+      if (value > -1) {
+        this.mediaDeviceMic.formControl.setValue(value)
+      }
+    }
+
+    if (inputVideo && this.mediaDeviceCam) {
+      const listCamera = this.InputConfigService.getCurrentListCamera()
+      const value = this.InputConfigService.findDeviceIndex(listCamera, inputVideo)
+      if (value > -1) {
+        this.mediaDeviceCam.formControl.setValue(value)
+      }
+    }
+
+    if (outputAudio && this.mediaDeviceSpeaker) {
+      const listSpeaker = this.InputConfigService.getCurrentListSpeaker()
+      const value = this.InputConfigService.findDeviceIndex(listSpeaker, outputAudio)
+      if (value > -1) {
+        this.mediaDeviceSpeaker.formControl.setValue(value)
+      }
+    }
+  }
+
+
 
 
 }

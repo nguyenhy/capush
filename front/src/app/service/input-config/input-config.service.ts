@@ -6,6 +6,15 @@ import { BehaviorSubject, Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class InputConfigService {
+  public outputAudioObservable: Observable<IDevice | null>
+  private outputAudioBehaviorSubject: BehaviorSubject<IDevice | null>
+
+  public inputAudioObservable: Observable<IDevice | null>
+  private inputAudioBehaviorSubject: BehaviorSubject<IDevice | null>
+
+  public inputVideoObservable: Observable<IDevice | null>
+  private inputVideoBehaviorSubject: BehaviorSubject<IDevice | null>
+
   public localStreamObservable: Observable<MediaStream | null>
   private localStreamBehaviorSubject: BehaviorSubject<MediaStream | null>
 
@@ -18,9 +27,17 @@ export class InputConfigService {
   public listSpeakerObservable: Observable<Array<IDevice>>
   private listSpeakerBehaviorSubject: BehaviorSubject<Array<IDevice>>
   constructor() {
-
     this.localStreamBehaviorSubject = new BehaviorSubject<MediaStream | null>(null)
     this.localStreamObservable = this.localStreamBehaviorSubject.asObservable()
+
+    this.outputAudioBehaviorSubject = new BehaviorSubject<IDevice | null>(null)
+    this.outputAudioObservable = this.outputAudioBehaviorSubject.asObservable()
+
+    this.inputAudioBehaviorSubject = new BehaviorSubject<IDevice | null>(null)
+    this.inputAudioObservable = this.inputAudioBehaviorSubject.asObservable()
+
+    this.inputVideoBehaviorSubject = new BehaviorSubject<IDevice | null>(null)
+    this.inputVideoObservable = this.inputVideoBehaviorSubject.asObservable()
 
     this.listMicBehaviorSubject = new BehaviorSubject<Array<IDevice>>([])
     this.listMicObservable = this.listMicBehaviorSubject.asObservable()
@@ -32,8 +49,10 @@ export class InputConfigService {
     this.listSpeakerObservable = this.listSpeakerBehaviorSubject.asObservable()
   }
 
-  initService() {
-    this.requestUserMedia()
+  initService(option: IInitServiceOption) {
+    this.refreshListMediaDevice()
+    this.loadSavedUserMedia(option)
+
   }
 
   async getUserMedia(constraints: MediaStreamConstraints): Promise<MediaStream | null> {
@@ -44,7 +63,26 @@ export class InputConfigService {
 
       return stream
     } catch (error) {
-      console.error('getUserMedia', error.name, error.code)
+      //log to console first 
+      console.error('getUserMedia', error.name, error.code, error)
+
+      /**
+       * add error handle suggest from [here](https://blog.addpipe.com/common-getusermedia-errors/)
+       */
+      if (error.name == "NotFoundError" || error.name == "DevicesNotFoundError") {
+        //required track is missing 
+      } else if (error.name == "NotReadableError" || error.name == "TrackStartError") {
+        //webcam or mic are already in use 
+      } else if (error.name == "OverconstrainedError" || error.name == "ConstraintNotSatisfiedError") {
+        //constraints can not be satisfied by avb. devices 
+      } else if (error.name == "NotAllowedError" || error.name == "PermissionDeniedError") {
+        //permission denied in browser 
+      } else if (error.name == "TypeError" || error.name == "TypeError") {
+        //empty constraints object 
+      } else {
+        //other errors 
+      }
+
       this.refreshListMediaDevice()
       this.localStreamBehaviorSubject.next(null)
       return null
@@ -65,35 +103,50 @@ export class InputConfigService {
     }
   }
 
-  async requestUserMedia() {
-    const self = this;
-    const constraints: MediaStreamConstraints = {
-      audio: false,
-      video: false,
-    };
-    DetectRTC.load(function () {
-      console.log(JSON.parse(JSON.stringify(DetectRTC)))
+  async loadSavedUserMedia(option: IInitServiceOption) {
+    const constraints: MediaStreamConstraints = {};
+    constraints.audio = this.getAudioConstraint(option.inputAudio)
+    constraints.video = this.getVideoConstraint(option.inputVideo)
+
+    this.stopAllTrack()
+
+    DetectRTC.load(() => {
       // has all permission
-      if (DetectRTC.isWebsiteHasMicrophonePermissions && DetectRTC.isWebsiteHasWebcamPermissions) {
-        self.refreshListMediaDevice()
-      } else {
+      this.getUserMedia(constraints)
+    })
 
-        if (DetectRTC.isWebsiteHasMicrophonePermissions) {
-          // doesn't as microphone permission
-          constraints.audio = true
+  }
 
-        } else if (DetectRTC.isWebsiteHasWebcamPermissions) {
-          // doesn't as webcam permission
-          constraints.video = true
+  async requestUserMedia(device: IDevice) {
+    const self = this;
+    const constraints: MediaStreamConstraints = {};
 
-        } else {
-          // doesn't as any permission
-          constraints.audio = true
-          constraints.video = true
+    // "audioinput" | "audiooutput" | "videoinput"
+    if (device.kind === 'audioinput') {
+      constraints.video = this.getVideoConstraint()
+      constraints.audio = this.getAudioConstraint(device)
 
-        }
-        self.getUserMedia(constraints)
-      }
+      this.stopAllTrack()
+      this.inputAudioBehaviorSubject.next(device)
+
+    } else if (device.kind === 'videoinput') {
+      constraints.video = this.getVideoConstraint(device)
+      constraints.audio = this.getAudioConstraint()
+
+
+      this.stopAllTrack()
+      this.inputVideoBehaviorSubject.next(device)
+
+    } else {
+
+      this.outputAudioBehaviorSubject.next(device)
+      return
+    }
+
+
+    DetectRTC.load(function () {
+      // has all permission
+      self.getUserMedia(constraints)
     })
   }
 
@@ -102,6 +155,121 @@ export class InputConfigService {
     this.listMicBehaviorSubject.next(DetectRTC.audioInputDevices)
     this.listCameraBehaviorSubject.next(DetectRTC.videoInputDevices)
     this.listSpeakerBehaviorSubject.next(DetectRTC.audioOutputDevices)
+  }
+
+  getCurrentStream() {
+    return this.localStreamBehaviorSubject.getValue()
+  }
+
+  getCurrentOutputAudio() {
+    return this.outputAudioBehaviorSubject.getValue()
+  }
+
+  getCurrentInputAudio() {
+    return this.inputAudioBehaviorSubject.getValue()
+  }
+
+  getCurrentInputVideo() {
+    return this.inputVideoBehaviorSubject.getValue()
+  }
+
+  getCurrentListMic() {
+    return this.listMicBehaviorSubject.getValue()
+  }
+
+  getCurrentListCamera() {
+    return this.listCameraBehaviorSubject.getValue()
+  }
+
+  getCurrentListSpeaker() {
+    return this.listSpeakerBehaviorSubject.getValue()
+  }
+
+
+
+  getAudioConstraint(device: IDevice | null = null): boolean | MediaTrackConstraints {
+    if (device) {
+
+      return {
+        advanced: [
+          {
+            deviceId: device.deviceId,
+            echoCancellation: {
+              exact: true
+            }
+          }
+        ]
+      }
+
+    } else {
+      const selectedAudio = this.inputAudioBehaviorSubject.getValue()
+      if (selectedAudio) {
+        return {
+          advanced: [
+            {
+              deviceId: selectedAudio.deviceId,
+              echoCancellation: {
+                exact: true
+              }
+            }
+          ]
+        }
+      } else {
+        return true
+      }
+    }
+  }
+
+  getVideoConstraint(device: IDevice | null = null): boolean | MediaTrackConstraints {
+    if (device) {
+
+      return {
+        advanced: [
+          {
+            width: 1280,
+            height: 720,
+            deviceId: device.deviceId,
+            echoCancellation: {
+              exact: true
+            }
+          }
+        ]
+      }
+
+    } else {
+      const selectedVideo = this.inputVideoBehaviorSubject.getValue()
+      if (selectedVideo) {
+        return {
+          advanced: [
+            {
+              width: 1280,
+              height: 720,
+              deviceId: selectedVideo.deviceId,
+              echoCancellation: {
+                exact: true
+              }
+            }
+          ]
+        }
+      } else {
+        return true
+      }
+    }
+  }
+
+  findDeviceIndex(listDevice: Array<IDevice | null>, device: IDevice | null) {
+    let value = -1;
+
+    if (!listDevice.length) {
+      return value;
+    }
+
+    listDevice.forEach((item, index) => {
+      if (item?.deviceId === device?.deviceId) {
+        value = index
+      }
+    })
+    return value;
   }
 }
 
@@ -113,8 +281,17 @@ export class InputConfigService {
 export interface IDevice {
   deviceId: string;
   groupId: string;
-  id: string;
-  isCustomLabel?: boolean;
   kind: string;
   label: string;
+
+  id: string;
+  isCustomLabel?: boolean;
+}
+
+
+
+export interface IInitServiceOption {
+  outputAudio: IDevice | null,
+  inputAudio: IDevice | null,
+  inputVideo: IDevice | null,
 }
