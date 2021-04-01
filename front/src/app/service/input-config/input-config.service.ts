@@ -1,65 +1,68 @@
 import { Injectable } from '@angular/core';
 import * as DetectRTC from 'detectrtc';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { Subject, Observable } from 'rxjs';
+import { EStorage, LocalStorageService } from '../local-storage/local-storage.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class InputConfigService {
   public outputAudioObservable: Observable<IDevice | null>
-  private outputAudioBehaviorSubject: BehaviorSubject<IDevice | null>
+  private outputAudioSubject: Subject<IDevice | null>
 
   public inputAudioObservable: Observable<IDevice | null>
-  private inputAudioBehaviorSubject: BehaviorSubject<IDevice | null>
+  private inputAudioSubject: Subject<IDevice | null>
 
   public inputVideoObservable: Observable<IDevice | null>
-  private inputVideoBehaviorSubject: BehaviorSubject<IDevice | null>
+  private inputVideoSubject: Subject<IDevice | null>
 
   public localStreamObservable: Observable<MediaStream | null>
-  private localStreamBehaviorSubject: BehaviorSubject<MediaStream | null>
+  private localStreamSubject: Subject<MediaStream | null>
 
   public listMicObservable: Observable<Array<IDevice>>
-  private listMicBehaviorSubject: BehaviorSubject<Array<IDevice>>
+  private listMicSubject: Subject<Array<IDevice>>
 
   public listCameraObservable: Observable<Array<IDevice>>
-  private listCameraBehaviorSubject: BehaviorSubject<Array<IDevice>>
+  private listCameraSubject: Subject<Array<IDevice>>
 
   public listSpeakerObservable: Observable<Array<IDevice>>
-  private listSpeakerBehaviorSubject: BehaviorSubject<Array<IDevice>>
-  constructor() {
-    this.localStreamBehaviorSubject = new BehaviorSubject<MediaStream | null>(null)
-    this.localStreamObservable = this.localStreamBehaviorSubject.asObservable()
+  private listSpeakerSubject: Subject<Array<IDevice>>
+  constructor(
+    private LocalStorageService: LocalStorageService,
+  ) {
+    this.localStreamSubject = new Subject<MediaStream | null>()
+    this.localStreamObservable = this.localStreamSubject.asObservable()
 
-    this.outputAudioBehaviorSubject = new BehaviorSubject<IDevice | null>(null)
-    this.outputAudioObservable = this.outputAudioBehaviorSubject.asObservable()
+    this.outputAudioSubject = new Subject<IDevice | null>()
+    this.outputAudioObservable = this.outputAudioSubject.asObservable()
 
-    this.inputAudioBehaviorSubject = new BehaviorSubject<IDevice | null>(null)
-    this.inputAudioObservable = this.inputAudioBehaviorSubject.asObservable()
+    this.inputAudioSubject = new Subject<IDevice | null>()
+    this.inputAudioObservable = this.inputAudioSubject.asObservable()
 
-    this.inputVideoBehaviorSubject = new BehaviorSubject<IDevice | null>(null)
-    this.inputVideoObservable = this.inputVideoBehaviorSubject.asObservable()
+    this.inputVideoSubject = new Subject<IDevice | null>()
+    this.inputVideoObservable = this.inputVideoSubject.asObservable()
 
-    this.listMicBehaviorSubject = new BehaviorSubject<Array<IDevice>>([])
-    this.listMicObservable = this.listMicBehaviorSubject.asObservable()
+    this.listMicSubject = new Subject<Array<IDevice>>()
+    this.listMicObservable = this.listMicSubject.asObservable()
 
-    this.listCameraBehaviorSubject = new BehaviorSubject<Array<IDevice>>([])
-    this.listCameraObservable = this.listCameraBehaviorSubject.asObservable()
+    this.listCameraSubject = new Subject<Array<IDevice>>()
+    this.listCameraObservable = this.listCameraSubject.asObservable()
 
-    this.listSpeakerBehaviorSubject = new BehaviorSubject<Array<IDevice>>([])
-    this.listSpeakerObservable = this.listSpeakerBehaviorSubject.asObservable()
+    this.listSpeakerSubject = new Subject<Array<IDevice>>()
+    this.listSpeakerObservable = this.listSpeakerSubject.asObservable()
   }
 
   initService(option: IInitServiceOption) {
+    this.subscribeMediaDeviceChange()
     this.refreshListMediaDevice()
     this.loadSavedUserMedia(option)
-
   }
 
   async getUserMedia(constraints: MediaStreamConstraints): Promise<MediaStream | null> {
     try {
       const stream: MediaStream = await navigator.mediaDevices.getUserMedia(constraints)
       this.refreshListMediaDevice()
-      this.localStreamBehaviorSubject.next(stream)
+      this.localStreamSubject.next(stream)
 
       return stream
     } catch (error) {
@@ -84,31 +87,16 @@ export class InputConfigService {
       }
 
       this.refreshListMediaDevice()
-      this.localStreamBehaviorSubject.next(null)
+      this.localStreamSubject.next(null)
       return null
     }
   }
 
-  stopAllTrack() {
-    const stream = this.localStreamBehaviorSubject.value
-    if (!stream) {
-      return
-    }
-
-    const track = stream.getTracks()
-    if (track && track.length) {
-      track.forEach(function (item) {
-        item.stop()
-      })
-    }
-  }
 
   async loadSavedUserMedia(option: IInitServiceOption) {
     const constraints: MediaStreamConstraints = {};
     constraints.audio = this.getAudioConstraint(option.inputAudio)
     constraints.video = this.getVideoConstraint(option.inputVideo)
-
-    this.stopAllTrack()
 
     DetectRTC.load(() => {
       // has all permission
@@ -126,20 +114,18 @@ export class InputConfigService {
       constraints.video = this.getVideoConstraint()
       constraints.audio = this.getAudioConstraint(device)
 
-      this.stopAllTrack()
-      this.inputAudioBehaviorSubject.next(device)
+      this.inputAudioSubject.next(device)
 
     } else if (device.kind === 'videoinput') {
       constraints.video = this.getVideoConstraint(device)
       constraints.audio = this.getAudioConstraint()
 
 
-      this.stopAllTrack()
-      this.inputVideoBehaviorSubject.next(device)
+      this.inputVideoSubject.next(device)
 
     } else {
 
-      this.outputAudioBehaviorSubject.next(device)
+      this.outputAudioSubject.next(device)
       return
     }
 
@@ -152,37 +138,33 @@ export class InputConfigService {
 
 
   refreshListMediaDevice() {
-    this.listMicBehaviorSubject.next(DetectRTC.audioInputDevices)
-    this.listCameraBehaviorSubject.next(DetectRTC.videoInputDevices)
-    this.listSpeakerBehaviorSubject.next(DetectRTC.audioOutputDevices)
-  }
-
-  getCurrentStream() {
-    return this.localStreamBehaviorSubject.getValue()
+    this.listMicSubject.next(DetectRTC.audioInputDevices)
+    this.listCameraSubject.next(DetectRTC.videoInputDevices)
+    this.listSpeakerSubject.next(DetectRTC.audioOutputDevices)
   }
 
   getCurrentOutputAudio() {
-    return this.outputAudioBehaviorSubject.getValue()
+    return this.LocalStorageService.get(EStorage.settingSelectedAudioOutput)
   }
 
   getCurrentInputAudio() {
-    return this.inputAudioBehaviorSubject.getValue()
+    return this.LocalStorageService.get(EStorage.settingSelectedAudioInput)
   }
 
   getCurrentInputVideo() {
-    return this.inputVideoBehaviorSubject.getValue()
+    return this.LocalStorageService.get(EStorage.settingSelectedVideoInput)
   }
 
   getCurrentListMic() {
-    return this.listMicBehaviorSubject.getValue()
+    return DetectRTC.audioInputDevices
   }
 
   getCurrentListCamera() {
-    return this.listCameraBehaviorSubject.getValue()
+    return DetectRTC.videoInputDevices
   }
 
   getCurrentListSpeaker() {
-    return this.listSpeakerBehaviorSubject.getValue()
+    return DetectRTC.audioOutputDevices
   }
 
 
@@ -202,7 +184,7 @@ export class InputConfigService {
       }
 
     } else {
-      const selectedAudio = this.inputAudioBehaviorSubject.getValue()
+      const selectedAudio = this.getCurrentInputAudio()
       if (selectedAudio) {
         return {
           advanced: [
@@ -237,7 +219,7 @@ export class InputConfigService {
       }
 
     } else {
-      const selectedVideo = this.inputVideoBehaviorSubject.getValue()
+      const selectedVideo = this.getCurrentInputVideo()
       if (selectedVideo) {
         return {
           advanced: [
@@ -270,6 +252,43 @@ export class InputConfigService {
       }
     })
     return value;
+  }
+
+
+  saveInputAudio(device: IDevice | null) {
+    if (!device) {
+      return
+    }
+
+    this.LocalStorageService.set(EStorage.settingSelectedAudioInput, device)
+  }
+
+  saveInputVideo(device: IDevice | null) {
+    if (!device) {
+      return
+    }
+    this.LocalStorageService.set(EStorage.settingSelectedVideoInput, device)
+  }
+
+  saveOutputVideo(device: IDevice | null) {
+    if (!device) {
+      return
+    }
+    this.LocalStorageService.set(EStorage.settingSelectedAudioOutput, device)
+  }
+
+  subscribeMediaDeviceChange() {
+    this.inputAudioObservable.subscribe((device) => {
+      this.saveInputAudio(device)
+    })
+
+    this.inputVideoObservable.subscribe((device) => {
+      this.saveInputVideo(device)
+    })
+
+    this.outputAudioObservable.subscribe((device) => {
+      this.saveOutputVideo(device)
+    })
   }
 }
 

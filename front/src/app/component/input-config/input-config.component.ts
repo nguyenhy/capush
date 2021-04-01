@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { MatSelectChange } from '@angular/material/select';
 import * as DetectRTC from 'detectrtc';
@@ -6,6 +6,7 @@ import * as DetectRTC from 'detectrtc';
 import { IDevice, InputConfigService } from 'src/app/service/input-config/input-config.service';
 import { EStorage, LocalStorageService } from 'src/app/service/local-storage/local-storage.service';
 import { MatSelectComponent } from '../mat-select/mat-select.component';
+import { VideoStreamComponent } from '../video-stream/video-stream.component';
 
 @Component({
   selector: 'app-input-config',
@@ -18,11 +19,17 @@ export class InputConfigComponent implements OnInit, AfterViewInit {
   public listSpeaker: Array<IDevice> = []
   public supportChangeSpeaker: boolean = false
 
-  public videoMediaStream: MediaStream | null = null
-
+  /* decorator */
+  // belong to this view
   @ViewChild('mediaDeviceMic') mediaDeviceMic!: MatSelectComponent<IDevice>;
   @ViewChild('mediaDeviceCam') mediaDeviceCam!: MatSelectComponent<IDevice>;
   @ViewChild('mediaDeviceSpeaker') mediaDeviceSpeaker!: MatSelectComponent<IDevice>;
+  @ViewChild('videoStream') videoStream!: VideoStreamComponent;
+
+  // input
+  // output
+
+
   constructor(
     private InputConfigService: InputConfigService,
     private LocalStorageService: LocalStorageService,
@@ -41,7 +48,6 @@ export class InputConfigComponent implements OnInit, AfterViewInit {
 
     DetectRTC.load(() => {
       this.subscribeListMediaChange()
-      this.subscribeMediaDeviceChange()
 
       this.loadSavedMediaDevice()
     })
@@ -73,20 +79,6 @@ export class InputConfigComponent implements OnInit, AfterViewInit {
   }
 
 
-  async subscribeMediaDeviceChange() {
-    this.InputConfigService.inputAudioObservable.subscribe((device) => {
-      this.saveInputAudio(device)
-    })
-
-    this.InputConfigService.inputVideoObservable.subscribe((device) => {
-      this.saveInputVideo(device)
-    })
-
-    this.InputConfigService.outputAudioObservable.subscribe((device) => {
-      this.saveOutputVideo(device)
-    })
-  }
-
   async subscribeListMediaChange() {
     const self = this;
 
@@ -103,39 +95,20 @@ export class InputConfigComponent implements OnInit, AfterViewInit {
     })
 
     this.InputConfigService.localStreamObservable.subscribe((mediaStream) => {
-      this.videoMediaStream = mediaStream
+      this.videoStream.updateStream(mediaStream)
+    })
+
+    this.InputConfigService.outputAudioObservable.subscribe((device) => {
+      this.videoStream.setSinkId(device)
     })
 
   }
 
 
-  saveInputAudio(device: IDevice | null) {
-    if (!device) {
-      return
-    }
-
-    this.LocalStorageService.set(EStorage.settingSelectedAudioInput, device)
-  }
-
-  saveInputVideo(device: IDevice | null) {
-    if (!device) {
-      return
-    }
-    this.LocalStorageService.set(EStorage.settingSelectedVideoInput, device)
-  }
-
-  saveOutputVideo(device: IDevice | null) {
-    if (!device) {
-      return
-    }
-    this.LocalStorageService.set(EStorage.settingSelectedAudioOutput, device)
-  }
-
-
   async loadSavedMediaDevice() {
-    const inputVideo: IDevice | null = this.LocalStorageService.get(EStorage.settingSelectedVideoInput)
-    const inputAudio: IDevice | null = this.LocalStorageService.get(EStorage.settingSelectedAudioInput)
-    const outputAudio: IDevice | null = this.LocalStorageService.get(EStorage.settingSelectedAudioOutput)
+    const inputVideo: IDevice | null = this.InputConfigService.getCurrentInputVideo()
+    const inputAudio: IDevice | null = this.InputConfigService.getCurrentInputAudio()
+    const outputAudio: IDevice | null = this.InputConfigService.getCurrentOutputAudio()
 
     this.InputConfigService.initService({
       inputVideo,
@@ -145,30 +118,28 @@ export class InputConfigComponent implements OnInit, AfterViewInit {
 
     if (inputAudio && this.mediaDeviceMic) {
       const listMic = this.InputConfigService.getCurrentListMic()
-      const value = this.InputConfigService.findDeviceIndex(listMic, inputAudio)
-      if (value > -1) {
-        this.mediaDeviceMic.formControl.setValue(value)
+      const index = this.InputConfigService.findDeviceIndex(listMic, inputAudio)
+      if (index > -1) {
+        this.mediaDeviceMic.setValue(index)
       }
     }
 
     if (inputVideo && this.mediaDeviceCam) {
       const listCamera = this.InputConfigService.getCurrentListCamera()
-      const value = this.InputConfigService.findDeviceIndex(listCamera, inputVideo)
-      if (value > -1) {
-        this.mediaDeviceCam.formControl.setValue(value)
+      const index = this.InputConfigService.findDeviceIndex(listCamera, inputVideo)
+      if (index > -1) {
+        this.mediaDeviceCam.setValue(index)
       }
     }
 
     if (outputAudio && this.mediaDeviceSpeaker) {
       const listSpeaker = this.InputConfigService.getCurrentListSpeaker()
-      const value = this.InputConfigService.findDeviceIndex(listSpeaker, outputAudio)
-      if (value > -1) {
-        this.mediaDeviceSpeaker.formControl.setValue(value)
+      const index = this.InputConfigService.findDeviceIndex(listSpeaker, outputAudio)
+      if (index > -1) {
+        this.mediaDeviceSpeaker.setValue(index)
       }
     }
+
   }
-
-
-
 
 }
