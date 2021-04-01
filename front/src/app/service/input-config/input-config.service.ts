@@ -194,7 +194,9 @@ export class InputConfigService {
         advanced: [
           {
             deviceId: device.deviceId,
-            echoCancellation: true
+            echoCancellation: {
+              exact: true
+            }
           }
         ]
       }
@@ -206,7 +208,9 @@ export class InputConfigService {
           advanced: [
             {
               deviceId: selectedAudio.deviceId,
-              echoCancellation: true
+              echoCancellation: {
+                exact: true
+              }
             }
           ]
         }
@@ -222,8 +226,12 @@ export class InputConfigService {
       return {
         advanced: [
           {
+            width: 1280,
+            height: 720,
             deviceId: device.deviceId,
-            echoCancellation: true
+            echoCancellation: {
+              exact: true
+            }
           }
         ]
       }
@@ -234,8 +242,12 @@ export class InputConfigService {
         return {
           advanced: [
             {
+              width: 1280,
+              height: 720,
               deviceId: selectedVideo.deviceId,
-              echoCancellation: true
+              echoCancellation: {
+                exact: true
+              }
             }
           ]
         }
