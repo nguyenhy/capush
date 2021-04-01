@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import * as DetectRTC from 'detectrtc';
 import { Subject, Observable } from 'rxjs';
 import { EStorage, LocalStorageService } from '../../local-storage/local-storage.service';
+import { IAllSetting } from '../settings.service';
 
 @Injectable({
   providedIn: 'root'
@@ -271,6 +272,14 @@ export class IOSettingService {
       this.saveOutputVideo(device)
     })
   }
+
+  getAllSetting(): Pick<IAllSetting, 'outputAudio' | 'inputAudio' | 'inputVideo'> {
+    return {
+      outputAudio: this.getCurrentOutputAudio(),
+      inputAudio: this.getCurrentInputAudio(),
+      inputVideo: this.getCurrentInputVideo(),
+    }
+  }
 }
 
 
@@ -290,8 +299,5 @@ export interface IDevice {
 
 
 
-export interface IInitServiceOption {
-  outputAudio: IDevice | null,
-  inputAudio: IDevice | null,
-  inputVideo: IDevice | null,
+export interface IInitServiceOption extends Pick<IAllSetting, 'outputAudio' | 'inputAudio' | 'inputVideo'> {
 }
