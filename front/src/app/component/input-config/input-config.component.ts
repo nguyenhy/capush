@@ -32,7 +32,6 @@ export class InputConfigComponent implements OnInit, AfterViewInit {
 
   constructor(
     private InputConfigService: InputConfigService,
-    private LocalStorageService: LocalStorageService,
   ) {
   }
 
@@ -106,9 +105,9 @@ export class InputConfigComponent implements OnInit, AfterViewInit {
 
 
   async loadSavedMediaDevice() {
-    const inputVideo: IDevice | null = this.InputConfigService.getCurrentInputVideo()
-    const inputAudio: IDevice | null = this.InputConfigService.getCurrentInputAudio()
-    const outputAudio: IDevice | null = this.InputConfigService.getCurrentOutputAudio()
+    const inputVideo = this.InputConfigService.getCurrentInputVideo()
+    const inputAudio = this.InputConfigService.getCurrentInputAudio()
+    const outputAudio = this.InputConfigService.getCurrentOutputAudio()
 
     this.InputConfigService.initService({
       inputVideo,
