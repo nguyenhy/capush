@@ -7,49 +7,30 @@ import { EStorage, LocalStorageService } from '../local-storage/local-storage.se
   providedIn: 'root'
 })
 export class IOSettingService {
-  public outputAudioObservable: Observable<IDevice | null>
-  private outputAudioSubject: Subject<IDevice | null>
+  private outputAudioSubject = new Subject<IDevice | null>()
+  public outputAudioObservable = this.outputAudioSubject.asObservable()
 
-  public inputAudioObservable: Observable<IDevice | null>
-  private inputAudioSubject: Subject<IDevice | null>
+  private inputAudioSubject = new Subject<IDevice | null>()
+  public inputAudioObservable = this.inputAudioSubject.asObservable()
 
-  public inputVideoObservable: Observable<IDevice | null>
-  private inputVideoSubject: Subject<IDevice | null>
+  private inputVideoSubject = new Subject<IDevice | null>()
+  public inputVideoObservable = this.inputVideoSubject.asObservable()
 
-  public localStreamObservable: Observable<MediaStream | null>
-  private localStreamSubject: Subject<MediaStream | null>
+  private localStreamSubject = new Subject<MediaStream | null>()
+  public localStreamObservable = this.localStreamSubject.asObservable()
 
-  public listMicObservable: Observable<Array<IDevice>>
-  private listMicSubject: Subject<Array<IDevice>>
+  private listMicSubject = new Subject<Array<IDevice>>()
+  public listMicObservable = this.listMicSubject.asObservable()
 
-  public listCameraObservable: Observable<Array<IDevice>>
-  private listCameraSubject: Subject<Array<IDevice>>
+  private listCameraSubject = new Subject<Array<IDevice>>()
+  public listCameraObservable = this.listCameraSubject.asObservable()
 
-  public listSpeakerObservable: Observable<Array<IDevice>>
-  private listSpeakerSubject: Subject<Array<IDevice>>
+  private listSpeakerSubject = new Subject<Array<IDevice>>()
+  public listSpeakerObservable = this.listSpeakerSubject.asObservable()
   constructor(
     private LocalStorageService: LocalStorageService,
   ) {
-    this.localStreamSubject = new Subject<MediaStream | null>()
-    this.localStreamObservable = this.localStreamSubject.asObservable()
 
-    this.outputAudioSubject = new Subject<IDevice | null>()
-    this.outputAudioObservable = this.outputAudioSubject.asObservable()
-
-    this.inputAudioSubject = new Subject<IDevice | null>()
-    this.inputAudioObservable = this.inputAudioSubject.asObservable()
-
-    this.inputVideoSubject = new Subject<IDevice | null>()
-    this.inputVideoObservable = this.inputVideoSubject.asObservable()
-
-    this.listMicSubject = new Subject<Array<IDevice>>()
-    this.listMicObservable = this.listMicSubject.asObservable()
-
-    this.listCameraSubject = new Subject<Array<IDevice>>()
-    this.listCameraObservable = this.listCameraSubject.asObservable()
-
-    this.listSpeakerSubject = new Subject<Array<IDevice>>()
-    this.listSpeakerObservable = this.listSpeakerSubject.asObservable()
   }
 
   initService(option: IInitServiceOption) {
