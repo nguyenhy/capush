@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { IDevice } from "../io-setting/io-setting.service"
+import { IDevice } from "../settings/io-setting/io-setting.service"
 
 @Injectable({
   providedIn: 'root'

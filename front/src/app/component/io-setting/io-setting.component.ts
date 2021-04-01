@@ -3,7 +3,7 @@ import { FormControl, Validators } from '@angular/forms';
 import { MatSelectChange } from '@angular/material/select';
 import * as DetectRTC from 'detectrtc';
 /* package */
-import { IDevice, IOSettingService } from 'src/app/service/io-setting/io-setting.service';
+import { IDevice, IOSettingService } from 'src/app/service/settings/io-setting/io-setting.service';
 import { EStorage, LocalStorageService } from 'src/app/service/local-storage/local-storage.service';
 import { MatSelectComponent } from '../mat-select/mat-select.component';
 import { VideoStreamComponent } from '../video-stream/video-stream.component';

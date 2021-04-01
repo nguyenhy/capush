@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import * as DetectRTC from 'detectrtc';
 import { Subject, Observable } from 'rxjs';
-import { EStorage, LocalStorageService } from '../local-storage/local-storage.service';
+import { EStorage, LocalStorageService } from '../../local-storage/local-storage.service';
 
 @Injectable({
   providedIn: 'root'

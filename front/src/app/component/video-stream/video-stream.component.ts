@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, ElementRef, Input, OnInit } from '@angular/core';
 import * as DetectRTC from 'detectrtc';
-import { IDevice, IOSettingService } from 'src/app/service/io-setting/io-setting.service';
+import { IDevice, IOSettingService } from 'src/app/service/settings/io-setting/io-setting.service';
 
 @Component({
   selector: 'app-video-stream',
