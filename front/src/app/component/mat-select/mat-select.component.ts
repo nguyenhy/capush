@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { MatSelectChange } from '@angular/material/select';
-import { IDevice } from 'src/app/service/input-config/input-config.service';
+import { IDevice } from 'src/app/service/io-setting/io-setting.service';
 
 @Component({
   selector: 'app-mat-select',

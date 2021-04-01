@@ -6,7 +6,7 @@ import { EStorage, LocalStorageService } from '../local-storage/local-storage.se
 @Injectable({
   providedIn: 'root'
 })
-export class InputConfigService {
+export class IOSettingService {
   public outputAudioObservable: Observable<IDevice | null>
   private outputAudioSubject: Subject<IDevice | null>
 

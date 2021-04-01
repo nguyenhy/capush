@@ -8,7 +8,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 
 
 import { HomepageComponent } from './page/homepage/homepage.component';
-import { InputConfigComponent } from './component/input-config/input-config.component';
+import { IOSettingComponent } from './component/io-setting/io-setting.component';
 import { VideoStreamComponent } from './component/video-stream/video-stream.component';
 import { MaterialModule } from './module/material/material.module';
 import { CommonModule, LocationStrategy, PathLocationStrategy } from '@angular/common';
@@ -20,7 +20,7 @@ import { MatSelectComponent } from './component/mat-select/mat-select.component'
   declarations: [
     AppComponent,
     HomepageComponent,
-    InputConfigComponent,
+    IOSettingComponent,
     VideoStreamComponent,
     PageLayoutComponent,
     SettingsComponent,

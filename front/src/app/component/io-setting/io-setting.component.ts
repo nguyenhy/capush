@@ -3,17 +3,17 @@ import { FormControl, Validators } from '@angular/forms';
 import { MatSelectChange } from '@angular/material/select';
 import * as DetectRTC from 'detectrtc';
 /* package */
-import { IDevice, InputConfigService } from 'src/app/service/input-config/input-config.service';
+import { IDevice, IOSettingService } from 'src/app/service/io-setting/io-setting.service';
 import { EStorage, LocalStorageService } from 'src/app/service/local-storage/local-storage.service';
 import { MatSelectComponent } from '../mat-select/mat-select.component';
 import { VideoStreamComponent } from '../video-stream/video-stream.component';
 
 @Component({
-  selector: 'app-input-config',
-  templateUrl: './input-config.component.html',
-  styleUrls: ['./input-config.component.scss']
+  selector: 'app-io-setting',
+  templateUrl: './io-setting.component.html',
+  styleUrls: ['./io-setting.component.scss']
 })
-export class InputConfigComponent implements OnInit, AfterViewInit {
+export class IOSettingComponent implements OnInit, AfterViewInit {
   public listMic: Array<IDevice> = []
   public listCamera: Array<IDevice> = []
   public listSpeaker: Array<IDevice> = []
@@ -31,7 +31,7 @@ export class InputConfigComponent implements OnInit, AfterViewInit {
 
 
   constructor(
-    private InputConfigService: InputConfigService,
+    private IOSettingService: IOSettingService,
   ) {
   }
 
@@ -57,7 +57,7 @@ export class InputConfigComponent implements OnInit, AfterViewInit {
     if (device.isCustomLabel) {
       // user change camera but not allow permission to camera
     } else {
-      this.InputConfigService.requestUserMedia(device)
+      this.IOSettingService.requestUserMedia(device)
     }
   }
 
@@ -65,7 +65,7 @@ export class InputConfigComponent implements OnInit, AfterViewInit {
     if (device.isCustomLabel) {
       // user change camera but not allow permission to camera
     } else {
-      this.InputConfigService.requestUserMedia(device)
+      this.IOSettingService.requestUserMedia(device)
     }
   }
 
@@ -73,7 +73,7 @@ export class InputConfigComponent implements OnInit, AfterViewInit {
     if (device.isCustomLabel) {
       // user change camera but not allow permission to camera
     } else {
-      this.InputConfigService.requestUserMedia(device)
+      this.IOSettingService.requestUserMedia(device)
     }
   }
 
@@ -81,23 +81,23 @@ export class InputConfigComponent implements OnInit, AfterViewInit {
   async subscribeListMediaChange() {
     const self = this;
 
-    this.InputConfigService.listMicObservable.subscribe((listMic) => {
+    this.IOSettingService.listMicObservable.subscribe((listMic) => {
       self.listMic = listMic;
     })
 
-    this.InputConfigService.listCameraObservable.subscribe((listCamera) => {
+    this.IOSettingService.listCameraObservable.subscribe((listCamera) => {
       self.listCamera = listCamera;
     })
 
-    this.InputConfigService.listSpeakerObservable.subscribe((listSpeaker) => {
+    this.IOSettingService.listSpeakerObservable.subscribe((listSpeaker) => {
       self.listSpeaker = listSpeaker;
     })
 
-    this.InputConfigService.localStreamObservable.subscribe((mediaStream) => {
+    this.IOSettingService.localStreamObservable.subscribe((mediaStream) => {
       this.videoStream.updateStream(mediaStream)
     })
 
-    this.InputConfigService.outputAudioObservable.subscribe((device) => {
+    this.IOSettingService.outputAudioObservable.subscribe((device) => {
       this.videoStream.setSinkId(device)
     })
 
@@ -105,35 +105,35 @@ export class InputConfigComponent implements OnInit, AfterViewInit {
 
 
   async loadSavedMediaDevice() {
-    const inputVideo = this.InputConfigService.getCurrentInputVideo()
-    const inputAudio = this.InputConfigService.getCurrentInputAudio()
-    const outputAudio = this.InputConfigService.getCurrentOutputAudio()
+    const inputVideo = this.IOSettingService.getCurrentInputVideo()
+    const inputAudio = this.IOSettingService.getCurrentInputAudio()
+    const outputAudio = this.IOSettingService.getCurrentOutputAudio()
 
-    this.InputConfigService.initService({
+    this.IOSettingService.initService({
       inputVideo,
       inputAudio,
       outputAudio,
     })
 
     if (inputAudio && this.mediaDeviceMic) {
-      const listMic = this.InputConfigService.getCurrentListMic()
-      const index = this.InputConfigService.findDeviceIndex(listMic, inputAudio)
+      const listMic = this.IOSettingService.getCurrentListMic()
+      const index = this.IOSettingService.findDeviceIndex(listMic, inputAudio)
       if (index > -1) {
         this.mediaDeviceMic.setValue(index)
       }
     }
 
     if (inputVideo && this.mediaDeviceCam) {
-      const listCamera = this.InputConfigService.getCurrentListCamera()
-      const index = this.InputConfigService.findDeviceIndex(listCamera, inputVideo)
+      const listCamera = this.IOSettingService.getCurrentListCamera()
+      const index = this.IOSettingService.findDeviceIndex(listCamera, inputVideo)
       if (index > -1) {
         this.mediaDeviceCam.setValue(index)
       }
     }
 
     if (outputAudio && this.mediaDeviceSpeaker) {
-      const listSpeaker = this.InputConfigService.getCurrentListSpeaker()
-      const index = this.InputConfigService.findDeviceIndex(listSpeaker, outputAudio)
+      const listSpeaker = this.IOSettingService.getCurrentListSpeaker()
+      const index = this.IOSettingService.findDeviceIndex(listSpeaker, outputAudio)
       if (index > -1) {
         this.mediaDeviceSpeaker.setValue(index)
       }

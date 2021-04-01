@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { InputConfigService } from './input-config.service';
+import { IOSettingService } from './io-setting.service';
 
-describe('InputConfigService', () => {
-  let service: InputConfigService;
+describe('IOSettingService', () => {
+  let service: IOSettingService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(InputConfigService);
+    service = TestBed.inject(IOSettingService);
   });
 
   it('should be created', () => {

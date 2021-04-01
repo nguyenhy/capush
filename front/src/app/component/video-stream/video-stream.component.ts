@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, ElementRef, Input, OnInit } from '@angular/core';
 import * as DetectRTC from 'detectrtc';
-import { IDevice, InputConfigService } from 'src/app/service/input-config/input-config.service';
+import { IDevice, IOSettingService } from 'src/app/service/io-setting/io-setting.service';
 
 @Component({
   selector: 'app-video-stream',
@@ -13,7 +13,7 @@ export class VideoStreamComponent implements OnInit {
   constructor(
     private ChangeDetectorRef: ChangeDetectorRef,
     private ElementRef: ElementRef,
-    private InputConfigService: InputConfigService
+    private IOSettingService: IOSettingService
   ) { }
 
   ngOnInit(): void {
