@@ -8,12 +8,12 @@ import { IDevice, IOSettingService } from 'src/app/service/settings/io-setting/i
   styleUrls: ['./video-stream.component.scss']
 })
 export class VideoStreamComponent implements OnInit {
-  hasStream: boolean = false
-  mediaStream: MediaStream | null = null
+  hasStream = false;
+  mediaStream: MediaStream | null = null;
   constructor(
-    private ChangeDetectorRef: ChangeDetectorRef,
-    private ElementRef: ElementRef,
-    private IOSettingService: IOSettingService
+    private changeDetectorRef: ChangeDetectorRef,
+    private elementRef: ElementRef,
+    private ioSettingService: IOSettingService
   ) { }
 
   ngOnInit(): void {
@@ -22,15 +22,15 @@ export class VideoStreamComponent implements OnInit {
   }
 
   updateStream(mediaStream: MediaStream | null) {
-    this.hasStream = !!mediaStream
-    this.ChangeDetectorRef.detectChanges()
+    this.hasStream = !!mediaStream;
+    this.changeDetectorRef.detectChanges();
     if (mediaStream) {
-      const nativeElement = this.ElementRef.nativeElement as HTMLElement
-      const $videoElement: HTMLVideoElement | null = nativeElement.querySelector('video')
+      const nativeElement = this.elementRef.nativeElement as HTMLElement;
+      const $videoElement: HTMLVideoElement | null = nativeElement.querySelector('video');
       if ($videoElement) {
-        this.stopAllTrack()
+        this.stopAllTrack();
 
-        $videoElement.srcObject = mediaStream
+        $videoElement.srcObject = mediaStream;
       }
     } else {
 
@@ -39,15 +39,15 @@ export class VideoStreamComponent implements OnInit {
 
   setSinkId(device: IDevice | null) {
     if (!DetectRTC.isSetSinkIdSupported) {
-      return
+      return;
     }
 
     if (device) {
-      const nativeElement = this.ElementRef.nativeElement as HTMLElement
-      const $videoElement: HTMLVideoElement | null = nativeElement.querySelector('video')
+      const nativeElement = this.elementRef.nativeElement as HTMLElement;
+      const $videoElement: HTMLVideoElement | null = nativeElement.querySelector('video');
       if ($videoElement) {
-        const $video = $videoElement as HTMLVideoElementSink
-        $video.setSinkId(device.deviceId)
+        const $video = $videoElement as HTMLVideoElementSink;
+        $video.setSinkId(device.deviceId);
       }
     } else {
 
@@ -56,14 +56,14 @@ export class VideoStreamComponent implements OnInit {
 
   stopAllTrack() {
     if (!this.mediaStream) {
-      return
+      return;
     }
 
-    const track = this.mediaStream.getTracks()
+    const track = this.mediaStream.getTracks();
     if (track && track.length) {
-      track.forEach(function (item) {
-        item.stop()
-      })
+      track.forEach((item) => {
+        item.stop();
+      });
     }
   }
 
@@ -72,5 +72,5 @@ export class VideoStreamComponent implements OnInit {
 
 
 interface HTMLVideoElementSink extends HTMLVideoElement {
-  setSinkId: (sinkId: string) => Promise<any>
+  setSinkId: (sinkId: string) => Promise<any>;
 }

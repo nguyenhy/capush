@@ -14,11 +14,6 @@ import { VideoStreamComponent } from '../video-stream/video-stream.component';
   styleUrls: ['./io-setting.component.scss']
 })
 export class IOSettingComponent implements OnInit, AfterViewInit {
-  public listMic: Array<IDevice> = []
-  public listCamera: Array<IDevice> = []
-  public listSpeaker: Array<IDevice> = []
-  public supportChangeSpeaker: boolean = false
-
   /* decorator */
   // belong to this view
   @ViewChild('mediaDeviceMic') mediaDeviceMic!: MatSelectComponent<IDevice>;
@@ -26,19 +21,24 @@ export class IOSettingComponent implements OnInit, AfterViewInit {
   @ViewChild('mediaDeviceSpeaker') mediaDeviceSpeaker!: MatSelectComponent<IDevice>;
   @ViewChild('videoStream') videoStream!: VideoStreamComponent;
 
+  public listMic: Array<IDevice> = [];
+  public listCamera: Array<IDevice> = [];
+  public listSpeaker: Array<IDevice> = [];
+  public supportChangeSpeaker = false;
+
+
   // input
   // output
 
 
   constructor(
-    private IOSettingService: IOSettingService,
+    private ioSettingService: IOSettingService,
   ) {
   }
 
   ngOnInit(): void {
     const self = this;
-    this.supportChangeSpeaker = DetectRTC.isSetSinkIdSupported
-
+    this.supportChangeSpeaker = DetectRTC.isSetSinkIdSupported;
 
   }
 
@@ -46,34 +46,33 @@ export class IOSettingComponent implements OnInit, AfterViewInit {
 
 
     DetectRTC.load(() => {
-      this.subscribeListMediaChange()
+      this.subscribeListMediaChange();
 
-      this.loadSavedMediaDevice()
-    })
-
+      this.loadSavedMediaDevice();
+    });
   }
 
-  __onChooseMic(device: IDevice) {
+  _onChooseMic(device: IDevice) {
     if (device.isCustomLabel) {
       // user change camera but not allow permission to camera
     } else {
-      this.IOSettingService.requestUserMedia(device)
+      this.ioSettingService.requestUserMedia(device);
     }
   }
 
-  __onChooseCamera(device: IDevice) {
+  _onChooseCamera(device: IDevice) {
     if (device.isCustomLabel) {
       // user change camera but not allow permission to camera
     } else {
-      this.IOSettingService.requestUserMedia(device)
+      this.ioSettingService.requestUserMedia(device);
     }
   }
 
-  __onChooseSpeaker(device: IDevice) {
+  _onChooseSpeaker(device: IDevice) {
     if (device.isCustomLabel) {
       // user change camera but not allow permission to camera
     } else {
-      this.IOSettingService.requestUserMedia(device)
+      this.ioSettingService.requestUserMedia(device);
     }
   }
 
@@ -81,61 +80,61 @@ export class IOSettingComponent implements OnInit, AfterViewInit {
   async subscribeListMediaChange() {
     const self = this;
 
-    this.IOSettingService.listMicObservable.subscribe((listMic) => {
+    this.ioSettingService.listMicObservable.subscribe((listMic) => {
       self.listMic = listMic;
-    })
+    });
 
-    this.IOSettingService.listCameraObservable.subscribe((listCamera) => {
+    this.ioSettingService.listCameraObservable.subscribe((listCamera) => {
       self.listCamera = listCamera;
-    })
+    });
 
-    this.IOSettingService.listSpeakerObservable.subscribe((listSpeaker) => {
+    this.ioSettingService.listSpeakerObservable.subscribe((listSpeaker) => {
       self.listSpeaker = listSpeaker;
-    })
+    });
 
-    this.IOSettingService.localStreamObservable.subscribe((mediaStream) => {
-      this.videoStream.updateStream(mediaStream)
-    })
+    this.ioSettingService.localStreamObservable.subscribe((mediaStream) => {
+      this.videoStream.updateStream(mediaStream);
+    });
 
-    this.IOSettingService.outputAudioObservable.subscribe((device) => {
-      this.videoStream.setSinkId(device)
-    })
+    this.ioSettingService.outputAudioObservable.subscribe((device) => {
+      this.videoStream.setSinkId(device);
+    });
 
   }
 
 
   async loadSavedMediaDevice() {
-    const inputVideo = this.IOSettingService.getCurrentInputVideo()
-    const inputAudio = this.IOSettingService.getCurrentInputAudio()
-    const outputAudio = this.IOSettingService.getCurrentOutputAudio()
+    const inputVideo = this.ioSettingService.getCurrentInputVideo();
+    const inputAudio = this.ioSettingService.getCurrentInputAudio();
+    const outputAudio = this.ioSettingService.getCurrentOutputAudio();
 
-    this.IOSettingService.initService({
+    this.ioSettingService.initService({
       inputVideo,
       inputAudio,
       outputAudio,
-    })
+    });
 
     if (inputAudio && this.mediaDeviceMic) {
-      const listMic = this.IOSettingService.getCurrentListMic()
-      const index = this.IOSettingService.findDeviceIndex(listMic, inputAudio)
+      const listMic = this.ioSettingService.getCurrentListMic();
+      const index = this.ioSettingService.findDeviceIndex(listMic, inputAudio);
       if (index > -1) {
-        this.mediaDeviceMic.setValue(index)
+        this.mediaDeviceMic.setValue(index);
       }
     }
 
     if (inputVideo && this.mediaDeviceCam) {
-      const listCamera = this.IOSettingService.getCurrentListCamera()
-      const index = this.IOSettingService.findDeviceIndex(listCamera, inputVideo)
+      const listCamera = this.ioSettingService.getCurrentListCamera();
+      const index = this.ioSettingService.findDeviceIndex(listCamera, inputVideo);
       if (index > -1) {
-        this.mediaDeviceCam.setValue(index)
+        this.mediaDeviceCam.setValue(index);
       }
     }
 
     if (outputAudio && this.mediaDeviceSpeaker) {
-      const listSpeaker = this.IOSettingService.getCurrentListSpeaker()
-      const index = this.IOSettingService.findDeviceIndex(listSpeaker, outputAudio)
+      const listSpeaker = this.ioSettingService.getCurrentListSpeaker();
+      const index = this.ioSettingService.findDeviceIndex(listSpeaker, outputAudio);
       if (index > -1) {
-        this.mediaDeviceSpeaker.setValue(index)
+        this.mediaDeviceSpeaker.setValue(index);
       }
     }
 

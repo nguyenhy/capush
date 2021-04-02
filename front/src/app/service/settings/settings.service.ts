@@ -7,21 +7,21 @@ import { IDevice, IOSettingService } from './io-setting/io-setting.service';
 export class SettingsService {
 
   constructor(
-    private IOSettingService: IOSettingService
+    private ioSettingService: IOSettingService,
   ) {
 
   }
 
   getAllSetting(): IAllSetting {
-    const ioSetting = this.IOSettingService.getAllSetting()
+    const ioSetting = this.ioSettingService.getAllSetting();
     return {
       ...ioSetting
-    }
+    };
   }
 }
 
 export interface IAllSetting {
-  outputAudio: IDevice | null,
-  inputAudio: IDevice | null,
-  inputVideo: IDevice | null,
+  outputAudio: IDevice | null;
+  inputAudio: IDevice | null;
+  inputVideo: IDevice | null;
 }

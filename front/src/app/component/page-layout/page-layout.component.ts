@@ -9,15 +9,15 @@ import { IMenuItem, PageInfoService } from 'src/app/service/page-info/page-info.
   styleUrls: ['./page-layout.component.scss']
 })
 export class PageLayoutComponent implements OnInit {
-  @Input() pageInfo: IMenuItem | null = null
-  @Input() pagePath: string = '';
-  
-  totalUnreadNoify: number = 0
-  listMenu: Array<IMenuItem> = []
+  @Input() pageInfo: IMenuItem | null = null;
+  @Input() pagePath = '';
+
+  totalUnreadNoify = 0;
+  listMenu: Array<IMenuItem> = [];
   constructor(
     private router: Router,
-    private PageInfoService: PageInfoService,
-    private NotificationService: NotificationService,
+    private pageInfoService: PageInfoService,
+    private potificationService: NotificationService,
   ) {
 
   }
@@ -25,21 +25,21 @@ export class PageLayoutComponent implements OnInit {
     // if input pageInfo empty
     if (!this.pageInfo) {
       // find base on "pagePath"
-      this.pageInfo = this.PageInfoService.get_page_info(this.pagePath)
+      this.pageInfo = this.pageInfoService.getPageInfo(this.pagePath);
     }
 
     // still empty
     if (!this.pageInfo) {
-      this.pageInfo = this.PageInfoService.get_page_info('/404')
+      this.pageInfo = this.pageInfoService.getPageInfo('/404');
     }
 
-    this.listMenu = this.PageInfoService.get_list_menu();
+    this.listMenu = this.pageInfoService.getListMenu();
 
-    this.NotificationService.initService()
-    
-    this.NotificationService.onNotifyChange.subscribe(() => {
-      this.totalUnreadNoify = this.NotificationService.totalUnreadNoify
-    })
+    this.potificationService.initService();
+
+    this.potificationService.onNotifyChange.subscribe(() => {
+      this.totalUnreadNoify = this.potificationService.totalUnreadNoify;
+    });
   }
 
 }

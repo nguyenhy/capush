@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
-import { IDevice } from "../settings/io-setting/io-setting.service"
+import { IDevice } from '../settings/io-setting/io-setting.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class LocalStorageService {
-  storage = window.localStorage
+  storage = window.localStorage;
   constructor() { }
 
   public remove(key: string) {
@@ -13,28 +13,28 @@ export class LocalStorageService {
   }
   public set<T extends EStorage>(key: T, item: TStorageMap[T]) {
     try {
-      const data: IStorage<T> = { item: item }
+      const data: IStorage<T> = { item };
       const value = JSON.stringify(data);
       this.storage.setItem(`${key}`, value);
 
     } catch (error) {
-      console.error(error)
+      console.error(error);
     }
   }
   public get<T extends EStorage>(key: T): TStorageMap[T] {
     try {
-      const data: string = this.storage.getItem(`${key}`) || ''
+      const data: string = this.storage.getItem(`${key}`) || '';
       if (data) {
         const value = JSON.parse(data);
         return value?.item ? value.item : null;
 
       } else {
-        return null
+        return null;
       }
 
     } catch (error) {
-      console.error(error)
-      return null
+      console.error(error);
+      return null;
     }
   }
 
@@ -52,12 +52,12 @@ export enum EStorage {
 
 
 export type TStorageMap = {
-  [key in EStorage]: IDevice | null
-}
+  [key in EStorage]: IDevice | null;
+};
 
-export type TStorageKey = keyof TStorageMap
+export type TStorageKey = keyof TStorageMap;
 
 
 export interface IStorage<T extends TStorageKey> {
-  item: TStorageMap[T]
+  item: TStorageMap[T];
 }

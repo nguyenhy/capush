@@ -7,14 +7,14 @@ export class PageInfoService {
 
   constructor() { }
 
-  get_page_info(path: string): IMenuItem | null {
-    return allPageInfo[path] || null
+  getPageInfo(path: string): IMenuItem | null {
+    return allPageInfo[path] || null;
   }
 
-  get_list_menu() {
+  getListMenu() {
     return [
       allPageInfo['/input-output'],
-    ]
+    ];
   }
 }
 
@@ -51,15 +51,15 @@ export const allPageInfo: IAllPageInfo = {
     title: 'input-output demo',
     path: '/input-output'
   },
-} as const
+};
 
 export interface IAllPageInfo {
-  [key: string]: IMenuItem
+  [key: string]: IMenuItem;
 }
 
 export interface IMenuItem {
-  icon: string
-  text: string
-  title: string
-  path: string
+  icon: string;
+  text: string;
+  title: string;
+  path: string;
 }

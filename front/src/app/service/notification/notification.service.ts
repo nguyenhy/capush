@@ -1,24 +1,20 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class NotificationService {
-  private _allNotifyBehaviorSubject = new BehaviorSubject<Array<INotifyItem>>([])
+  onNotifyChange: Observable<any[]>;
+  totalUnreadNoify = 0;
 
-  onNotifyChange = this._allNotifyBehaviorSubject.asObservable()
-  totalUnreadNoify: number = 0
+  private allNotifySubject = new Subject<Array<any>>();
+
   constructor() {
-
+    this.onNotifyChange = this.allNotifySubject.asObservable();
   }
 
   initService() {
 
   }
-}
-
-
-export interface INotifyItem {
-
 }

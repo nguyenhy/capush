@@ -1,6 +1,6 @@
 <mat-form-field appearance="fill" class="mat-form-field">
     <mat-label>{{ fieldLabel }}</mat-label>
-    <mat-select (selectionChange)="__onChooseOption($event)" [formControl]="formControl">
+    <mat-select (selectionChange)="_onChooseOption($event)" [formControl]="formControl">
         <mat-option *ngFor="let item of listOption, index as index" [value]="index">{{ item.label }}</mat-option>
     </mat-select>
 </mat-form-field>

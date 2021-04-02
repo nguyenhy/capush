@@ -10,13 +10,13 @@ import { IDevice } from 'src/app/service/settings/io-setting/io-setting.service'
 })
 export class MatSelectComponent<T extends IMatSelectItem> implements OnInit {
   /* input */
-  @Input() listOption: Array<T> = []
-  @Input() fieldLabel: string = '';
+  @Input() listOption: Array<T> = [];
+  @Input() fieldLabel = '';
 
   /* output */
-  @Output() onChange: EventEmitter<T> = new EventEmitter()
+  @Output() matSelectChange: EventEmitter<T> = new EventEmitter();
 
-  formControl = new FormControl(0, Validators.required)
+  formControl = new FormControl(0, Validators.required);
 
   constructor(
 
@@ -28,11 +28,11 @@ export class MatSelectComponent<T extends IMatSelectItem> implements OnInit {
   }
 
   /* view handler */
-  public __onChooseOption(event: MatSelectChange) {
+  public _onChooseOption(event: MatSelectChange) {
     const activeIndex = event.value;
-    const selectedCamera: T = this.listOption[activeIndex]
+    const selectedCamera: T = this.listOption[activeIndex];
     if (selectedCamera) {
-      this.onChange.emit(selectedCamera)
+      this.matSelectChange.emit(selectedCamera);
     } else {
       // selected camera not found
     }
@@ -40,11 +40,11 @@ export class MatSelectComponent<T extends IMatSelectItem> implements OnInit {
 
   /* public method */
   public setValue(index: number) {
-    this.formControl.setValue(index)
+    this.formControl.setValue(index);
   }
 
 }
 
 export interface IMatSelectItem {
-  label: string
+  label: string;
 }
