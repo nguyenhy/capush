@@ -14,7 +14,7 @@ export class MatSelectComponent<T extends IMatSelectItem> implements OnInit {
   @Input() fieldLabel = '';
 
   /* output */
-  @Output() matSelectChange: EventEmitter<T> = new EventEmitter();
+  @Output() matSelectChange = new EventEmitter<T>();
 
   formControl = new FormControl(0, Validators.required);
 
@@ -29,7 +29,7 @@ export class MatSelectComponent<T extends IMatSelectItem> implements OnInit {
 
   /* view handler */
   public _onChooseOption(event: MatSelectChange) {
-    const activeIndex = event.value;
+    const activeIndex: number = event.value;
     const selectedCamera: T = this.listOption[activeIndex];
     if (selectedCamera) {
       this.matSelectChange.emit(selectedCamera);

@@ -2,7 +2,7 @@
     <label class="section-label">Mic</label>
     <div class="section-content">
         <div class="select">
-            <app-mat-select #mediaDeviceMic [fieldLabel]="'Choose audio input source'" [listOption]="listMic" (onChange)="__onChooseMic($event)">
+            <app-mat-select #mediaDeviceMic [fieldLabel]="'Choose audio input source'" [listOption]="listMic" (matSelectChange)="_onChooseMic($event)">
             </app-mat-select>
         </div>
         <div class="media">
@@ -16,7 +16,7 @@
     <label class="section-label">Camera</label>
     <div class="section-content">
         <div class="select">
-            <app-mat-select #mediaDeviceCam [fieldLabel]="'Choose video source'" [listOption]="listCamera" (onChange)="__onChooseCamera($event)">
+            <app-mat-select #mediaDeviceCam [fieldLabel]="'Choose video source'" [listOption]="listCamera" (matSelectChange)="_onChooseCamera($event)">
             </app-mat-select>
         </div>
         <div class="media">
@@ -30,7 +30,7 @@
     <label class="section-label">Speaker & headphone</label>
     <div class="section-content">
         <div class="select">
-            <app-mat-select #mediaDeviceSpeaker [fieldLabel]="'Choose audio output destination'" [listOption]="listSpeaker" (onChange)="__onChooseSpeaker($event)">
+            <app-mat-select #mediaDeviceSpeaker [fieldLabel]="'Choose audio output destination'" [listOption]="listSpeaker" (matSelectChange)="_onChooseSpeaker($event)">
             </app-mat-select>
         </div>
         <div class="media">
