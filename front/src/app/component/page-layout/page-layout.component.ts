@@ -21,7 +21,8 @@ export class PageLayoutComponent implements OnInit {
   ) {
 
   }
-  ngOnInit(): void {
+
+  public ngOnInit(): void {
     // if input pageInfo empty
     if (!this.pageInfo) {
       // find base on "pagePath"

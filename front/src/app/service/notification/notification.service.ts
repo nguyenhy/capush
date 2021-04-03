@@ -14,7 +14,7 @@ export class NotificationService {
     this.onNotifyChange = this.allNotifySubject.asObservable();
   }
 
-  initService() {
+  public initService() {
 
   }
 }

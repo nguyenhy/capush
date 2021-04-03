@@ -1,15 +1,38 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { VideoStreamComponent } from 'src/app/component/video-stream/video-stream.component';
+import { SettingsService } from 'src/app/service/settings/settings.service';
 
 @Component({
   selector: 'app-input-output',
   templateUrl: './input-output.component.html',
   styleUrls: ['./input-output.component.scss']
 })
-export class InputOutputComponent implements OnInit {
+export class InputOutputComponent implements OnInit, AfterViewInit {
 
-  constructor() { }
+  @ViewChild('videoStream') videoStream!: VideoStreamComponent;
 
-  ngOnInit(): void {
+  constructor(
+    private settingsService: SettingsService,
+  ) {
+
+  }
+
+  public ngOnInit(): void {
+
+  }
+
+  public ngAfterViewInit(): void {
+    this.initLocalVideo();
+  }
+
+
+  private async initLocalVideo() {
+    try {
+      const stream = await this.settingsService.getLocalStream();
+      this.videoStream.updateStream(stream);
+    } catch (error) {
+      console.error(error);
+    }
   }
 
 }

@@ -3,14 +3,9 @@ $width: 500px;
 .wrap {
     width: 100%;
     height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
 }
 video,
 span {
-    width: $width;
-    height: #{$width / 16 * 9};
     background-color: #000;
     color: #fff;
 }

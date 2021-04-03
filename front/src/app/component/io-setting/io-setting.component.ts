@@ -36,13 +36,13 @@ export class IOSettingComponent implements OnInit, AfterViewInit {
   ) {
   }
 
-  ngOnInit(): void {
+  public ngOnInit(): void {
     const self = this;
     this.supportChangeSpeaker = DetectRTC.isSetSinkIdSupported;
 
   }
 
-  ngAfterViewInit() {
+  public ngAfterViewInit() {
 
 
     DetectRTC.load(() => {
@@ -52,7 +52,7 @@ export class IOSettingComponent implements OnInit, AfterViewInit {
     });
   }
 
-  _onChooseMic(device: IDevice) {
+  public _onChooseMic(device: IDevice) {
     if (device.isCustomLabel) {
       // user change camera but not allow permission to camera
     } else {
@@ -60,7 +60,7 @@ export class IOSettingComponent implements OnInit, AfterViewInit {
     }
   }
 
-  _onChooseCamera(device: IDevice) {
+  public _onChooseCamera(device: IDevice) {
     if (device.isCustomLabel) {
       // user change camera but not allow permission to camera
     } else {
@@ -68,7 +68,7 @@ export class IOSettingComponent implements OnInit, AfterViewInit {
     }
   }
 
-  _onChooseSpeaker(device: IDevice) {
+  public _onChooseSpeaker(device: IDevice) {
     if (device.isCustomLabel) {
       // user change camera but not allow permission to camera
     } else {
@@ -77,7 +77,7 @@ export class IOSettingComponent implements OnInit, AfterViewInit {
   }
 
 
-  async subscribeListMediaChange() {
+  private async subscribeListMediaChange() {
     const self = this;
 
     this.ioSettingService.listMicObservable.subscribe((listMic) => {
@@ -103,7 +103,7 @@ export class IOSettingComponent implements OnInit, AfterViewInit {
   }
 
 
-  async loadSavedMediaDevice() {
+  private async loadSavedMediaDevice() {
     const inputVideo = this.ioSettingService.getCurrentInputVideo();
     const inputAudio = this.ioSettingService.getCurrentInputAudio();
     const outputAudio = this.ioSettingService.getCurrentOutputAudio();

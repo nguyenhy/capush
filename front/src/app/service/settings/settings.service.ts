@@ -12,11 +12,21 @@ export class SettingsService {
 
   }
 
-  getAllSetting(): IAllSetting {
-    const ioSetting = this.ioSettingService.getAllSetting();
+  public getAllSetting(): IAllSetting {
+    const ioSetting = this.ioSettingService.getIOSetting();
     return {
       ...ioSetting
     };
+  }
+
+  public async getLocalStream(): Promise<MediaStream | null> {
+    try {
+      const stream = await this.ioSettingService.getStreamFromSavedSetting();
+      return stream;
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
   }
 }
 

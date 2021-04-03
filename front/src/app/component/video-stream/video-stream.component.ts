@@ -8,22 +8,22 @@ import { IDevice, IOSettingService } from 'src/app/service/settings/io-setting/i
   styleUrls: ['./video-stream.component.scss']
 })
 export class VideoStreamComponent implements OnInit {
-  hasStream = false;
-  mediaStream: MediaStream | null = null;
+  public hasStream = false;
+  private mediaStream: MediaStream | null = null;
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
-    private elementRef: ElementRef,
-    private ioSettingService: IOSettingService
+    private elementRef: ElementRef
   ) { }
 
-  ngOnInit(): void {
+  public ngOnInit(): void {
     const self = this;
 
   }
 
-  updateStream(mediaStream: MediaStream | null) {
+  public updateStream(mediaStream: MediaStream | null) {
     this.hasStream = !!mediaStream;
     this.changeDetectorRef.detectChanges();
+
     if (mediaStream) {
       const nativeElement = this.elementRef.nativeElement as HTMLElement;
       const $videoElement: HTMLVideoElement | null = nativeElement.querySelector('video');
@@ -37,7 +37,7 @@ export class VideoStreamComponent implements OnInit {
     }
   }
 
-  setSinkId(device: IDevice | null) {
+  public setSinkId(device: IDevice | null) {
     if (!DetectRTC.isSetSinkIdSupported) {
       return;
     }
@@ -54,7 +54,7 @@ export class VideoStreamComponent implements OnInit {
     }
   }
 
-  stopAllTrack() {
+  public stopAllTrack() {
     if (!this.mediaStream) {
       return;
     }

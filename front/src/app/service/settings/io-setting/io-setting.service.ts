@@ -36,13 +36,217 @@ export class IOSettingService {
     this.listSpeakerObservable = this.listSpeakerSubject.asObservable();
   }
 
-  initService(option: IInitServiceOption) {
+  public initService(option: IInitServiceOption) {
     this.subscribeMediaDeviceChange();
     this.refreshListMediaDevice();
     this.loadSavedUserMedia(option);
   }
 
-  async getUserMedia(constraints: MediaStreamConstraints): Promise<MediaStream | null> {
+  public async requestUserMedia(device: IDevice) {
+    const self = this;
+    const constraints: MediaStreamConstraints = {};
+
+    // 'audioinput' | 'audiooutput' | 'videoinput'
+    if (device.kind === 'audioinput') {
+      constraints.video = this.getVideoConstraint();
+      constraints.audio = this.getAudioConstraint(device);
+
+      this.inputAudioSubject.next(device);
+
+    } else if (device.kind === 'videoinput') {
+      constraints.video = this.getVideoConstraint(device);
+      constraints.audio = this.getAudioConstraint();
+
+
+      this.inputVideoSubject.next(device);
+
+    } else {
+
+      this.outputAudioSubject.next(device);
+      return;
+    }
+
+
+    DetectRTC.load(() => {
+      // has all permission
+      self.getUserMedia(constraints);
+    });
+  }
+
+
+  public getCurrentOutputAudio() {
+    return this.localStorageService.get(EStorage.settingSelectedAudioOutput);
+  }
+
+  public getCurrentInputAudio() {
+    return this.localStorageService.get(EStorage.settingSelectedAudioInput);
+  }
+
+  public getCurrentInputVideo() {
+    return this.localStorageService.get(EStorage.settingSelectedVideoInput);
+  }
+
+  public getCurrentListMic() {
+    return DetectRTC.audioInputDevices;
+  }
+
+  public getCurrentListCamera() {
+    return DetectRTC.videoInputDevices;
+  }
+
+  public getCurrentListSpeaker() {
+    return DetectRTC.audioOutputDevices;
+  }
+
+  public findDeviceIndex(listDevice: Array<IDevice | null>, device: IDevice | null) {
+    let value = -1;
+
+    if (!listDevice.length) {
+      return value;
+    }
+
+    listDevice.forEach((item, index) => {
+      if (item?.deviceId === device?.deviceId) {
+        value = index;
+      }
+    });
+    return value;
+  }
+
+  public getIOSetting(): Pick<IAllSetting, 'outputAudio' | 'inputAudio' | 'inputVideo'> {
+    return {
+      outputAudio: this.getCurrentOutputAudio(),
+      inputAudio: this.getCurrentInputAudio(),
+      inputVideo: this.getCurrentInputVideo(),
+    };
+  }
+
+  public getStreamFromSavedSetting(): Promise<MediaStream | null> {
+    const inputVideo = this.getCurrentInputVideo();
+    const inputAudio = this.getCurrentInputAudio();
+    const outputAudio = this.getCurrentOutputAudio();
+
+    this.loadSavedUserMedia({
+      inputVideo,
+      inputAudio,
+      outputAudio,
+    });
+
+    return new Promise((resolve, reject) => {
+      this.localStreamSubject.subscribe((data: MediaStream | null) => {
+        resolve(data);
+      });
+    });
+  }
+
+  private getAudioConstraint(device: IDevice | null = null): boolean | MediaTrackConstraints {
+    if (device) {
+
+      return {
+        advanced: [
+          {
+            deviceId: device.deviceId,
+            echoCancellation: {
+              exact: true
+            }
+          }
+        ]
+      };
+
+    } else {
+      const selectedAudio = this.getCurrentInputAudio();
+      if (selectedAudio) {
+        return {
+          advanced: [
+            {
+              deviceId: selectedAudio.deviceId,
+              echoCancellation: {
+                exact: true
+              }
+            }
+          ]
+        };
+      } else {
+        return true;
+      }
+    }
+  }
+
+  private getVideoConstraint(device: IDevice | null = null): boolean | MediaTrackConstraints {
+    if (device) {
+
+      return {
+        advanced: [
+          {
+            width: 1280,
+            height: 720,
+            deviceId: device.deviceId,
+            echoCancellation: {
+              exact: true
+            }
+          }
+        ]
+      };
+
+    } else {
+      const selectedVideo = this.getCurrentInputVideo();
+      if (selectedVideo) {
+        return {
+          advanced: [
+            {
+              width: 1280,
+              height: 720,
+              deviceId: selectedVideo.deviceId,
+              echoCancellation: {
+                exact: true
+              }
+            }
+          ]
+        };
+      } else {
+        return true;
+      }
+    }
+  }
+
+  private saveInputAudio(device: IDevice | null) {
+    if (!device) {
+      return;
+    }
+
+    this.localStorageService.set(EStorage.settingSelectedAudioInput, device);
+  }
+
+  private saveInputVideo(device: IDevice | null) {
+    if (!device) {
+      return;
+    }
+    this.localStorageService.set(EStorage.settingSelectedVideoInput, device);
+  }
+
+  private saveOutputVideo(device: IDevice | null) {
+    if (!device) {
+      return;
+    }
+    this.localStorageService.set(EStorage.settingSelectedAudioOutput, device);
+  }
+
+  private subscribeMediaDeviceChange() {
+    this.inputAudioObservable.subscribe((device) => {
+      this.saveInputAudio(device);
+    });
+
+    this.inputVideoObservable.subscribe((device) => {
+      this.saveInputVideo(device);
+    });
+
+    this.outputAudioObservable.subscribe((device) => {
+      this.saveOutputVideo(device);
+    });
+  }
+
+
+  private async getUserMedia(constraints: MediaStreamConstraints): Promise<MediaStream | null> {
     try {
       const stream: MediaStream = await navigator.mediaDevices.getUserMedia(constraints);
       this.refreshListMediaDevice();
@@ -82,8 +286,7 @@ export class IOSettingService {
     }
   }
 
-
-  async loadSavedUserMedia(option: IInitServiceOption) {
+  private async loadSavedUserMedia(option: IInitServiceOption) {
     const constraints: MediaStreamConstraints = {};
     constraints.audio = this.getAudioConstraint(option.inputAudio);
     constraints.video = this.getVideoConstraint(option.inputVideo);
@@ -95,198 +298,10 @@ export class IOSettingService {
 
   }
 
-  async requestUserMedia(device: IDevice) {
-    const self = this;
-    const constraints: MediaStreamConstraints = {};
-
-    // 'audioinput' | 'audiooutput' | 'videoinput'
-    if (device.kind === 'audioinput') {
-      constraints.video = this.getVideoConstraint();
-      constraints.audio = this.getAudioConstraint(device);
-
-      this.inputAudioSubject.next(device);
-
-    } else if (device.kind === 'videoinput') {
-      constraints.video = this.getVideoConstraint(device);
-      constraints.audio = this.getAudioConstraint();
-
-
-      this.inputVideoSubject.next(device);
-
-    } else {
-
-      this.outputAudioSubject.next(device);
-      return;
-    }
-
-
-    DetectRTC.load(() => {
-      // has all permission
-      self.getUserMedia(constraints);
-    });
-  }
-
-
-  refreshListMediaDevice() {
+  private refreshListMediaDevice() {
     this.listMicSubject.next(DetectRTC.audioInputDevices);
     this.listCameraSubject.next(DetectRTC.videoInputDevices);
     this.listSpeakerSubject.next(DetectRTC.audioOutputDevices);
-  }
-
-  getCurrentOutputAudio() {
-    return this.localStorageService.get(EStorage.settingSelectedAudioOutput);
-  }
-
-  getCurrentInputAudio() {
-    return this.localStorageService.get(EStorage.settingSelectedAudioInput);
-  }
-
-  getCurrentInputVideo() {
-    return this.localStorageService.get(EStorage.settingSelectedVideoInput);
-  }
-
-  getCurrentListMic() {
-    return DetectRTC.audioInputDevices;
-  }
-
-  getCurrentListCamera() {
-    return DetectRTC.videoInputDevices;
-  }
-
-  getCurrentListSpeaker() {
-    return DetectRTC.audioOutputDevices;
-  }
-
-
-
-  getAudioConstraint(device: IDevice | null = null): boolean | MediaTrackConstraints {
-    if (device) {
-
-      return {
-        advanced: [
-          {
-            deviceId: device.deviceId,
-            echoCancellation: {
-              exact: true
-            }
-          }
-        ]
-      };
-
-    } else {
-      const selectedAudio = this.getCurrentInputAudio();
-      if (selectedAudio) {
-        return {
-          advanced: [
-            {
-              deviceId: selectedAudio.deviceId,
-              echoCancellation: {
-                exact: true
-              }
-            }
-          ]
-        };
-      } else {
-        return true;
-      }
-    }
-  }
-
-  getVideoConstraint(device: IDevice | null = null): boolean | MediaTrackConstraints {
-    if (device) {
-
-      return {
-        advanced: [
-          {
-            width: 1280,
-            height: 720,
-            deviceId: device.deviceId,
-            echoCancellation: {
-              exact: true
-            }
-          }
-        ]
-      };
-
-    } else {
-      const selectedVideo = this.getCurrentInputVideo();
-      if (selectedVideo) {
-        return {
-          advanced: [
-            {
-              width: 1280,
-              height: 720,
-              deviceId: selectedVideo.deviceId,
-              echoCancellation: {
-                exact: true
-              }
-            }
-          ]
-        };
-      } else {
-        return true;
-      }
-    }
-  }
-
-  findDeviceIndex(listDevice: Array<IDevice | null>, device: IDevice | null) {
-    let value = -1;
-
-    if (!listDevice.length) {
-      return value;
-    }
-
-    listDevice.forEach((item, index) => {
-      if (item?.deviceId === device?.deviceId) {
-        value = index;
-      }
-    });
-    return value;
-  }
-
-
-  saveInputAudio(device: IDevice | null) {
-    if (!device) {
-      return;
-    }
-
-    this.localStorageService.set(EStorage.settingSelectedAudioInput, device);
-  }
-
-  saveInputVideo(device: IDevice | null) {
-    if (!device) {
-      return;
-    }
-    this.localStorageService.set(EStorage.settingSelectedVideoInput, device);
-  }
-
-  saveOutputVideo(device: IDevice | null) {
-    if (!device) {
-      return;
-    }
-    this.localStorageService.set(EStorage.settingSelectedAudioOutput, device);
-  }
-
-  subscribeMediaDeviceChange() {
-    this.inputAudioObservable.subscribe((device) => {
-      this.saveInputAudio(device);
-    });
-
-    this.inputVideoObservable.subscribe((device) => {
-      this.saveInputVideo(device);
-    });
-
-    this.outputAudioObservable.subscribe((device) => {
-      this.saveOutputVideo(device);
-    });
-  }
-
-  getAllSetting(): Pick<IAllSetting, 'outputAudio' | 'inputAudio' | 'inputVideo'> {
-    return {
-      outputAudio: this.getCurrentOutputAudio(),
-      inputAudio: this.getCurrentInputAudio(),
-      inputVideo: this.getCurrentInputVideo(),
-    };
   }
 }
 
