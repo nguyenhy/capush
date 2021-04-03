@@ -36,18 +36,9 @@ export class InputOutputComponent implements OnInit, AfterViewInit {
 
 
         /* check input/output device disconnect */
-        // 1. input video
-        const videoTracks = stream.getVideoTracks();
-        if (videoTracks.length) {
-          const firstVideoTracks = videoTracks[0];
-          if (firstVideoTracks) {
-            firstVideoTracks.addEventListener('ended', (event) => {
-              console.error('check cam connection');
-            });
-          }
-        } else {
-          // some things wrong with the track
-        }
+        navigator.mediaDevices.addEventListener('devicechange', () => {
+          console.warn('devicechange');
+        });
 
       } else {
 
